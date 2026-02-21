@@ -1,0 +1,215 @@
+name: quality-gate (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        description: Node.js version for Node-based projects
+        required: false
+        default: "20"
+        type: string
+      run_lint:
+        description: Run lint checks
+        required: false
+        default: true
+        type: boolean
+      run_tests:
+        description: Run unit tests
+        required: false
+        default: true
+        type: boolean
+      run_build:
+        description: Run build checks
+        required: false
+        default: true
+        type: boolean
+      run_smoke:
+        description: Run optional smoke checks
+        required: false
+        default: false
+        type: boolean
+      install_command:
+        description: Optional install command override
+        required: false
+        default: ""
+        type: string
+      lint_command:
+        description: Optional lint command override
+        required: false
+        default: ""
+        type: string
+      test_command:
+        description: Optional test command override
+        required: false
+        default: ""
+        type: string
+      build_command:
+        description: Optional build command override
+        required: false
+        default: ""
+        type: string
+      smoke_command:
+        description: Optional smoke command override
+        required: false
+        default: ""
+        type: string
+      fail_if_no_checks:
+        description: Fail if no quality checks were executed
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  quality-gate:
+    name: quality-gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        if: ${{ hashFiles('package.json') != '' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            npm-shrinkwrap.json
+
+      - name: Run quality gate
+        shell: bash
+        env:
+          RUN_LINT: ${{ inputs.run_lint }}
+          RUN_TESTS: ${{ inputs.run_tests }}
+          RUN_BUILD: ${{ inputs.run_build }}
+          RUN_SMOKE: ${{ inputs.run_smoke }}
+          INSTALL_COMMAND: ${{ inputs.install_command }}
+          LINT_COMMAND: ${{ inputs.lint_command }}
+          TEST_COMMAND: ${{ inputs.test_command }}
+          BUILD_COMMAND: ${{ inputs.build_command }}
+          SMOKE_COMMAND: ${{ inputs.smoke_command }}
+          FAIL_IF_NO_CHECKS: ${{ inputs.fail_if_no_checks }}
+        run: |
+          set -euo pipefail
+
+          executed_checks=0
+          detected_stack=0
+
+          run_cmd() {
+            local label="$1"
+            local cmd="$2"
+            echo "==> ${label}: ${cmd}"
+            bash -lc "${cmd}"
+          }
+
+          has_npm_script() {
+            local script_name="$1"
+            node -e '
+              const fs = require("fs");
+              const script = process.argv[1];
+              const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
+              const has = pkg && pkg.scripts && Object.prototype.hasOwnProperty.call(pkg.scripts, script);
+              process.exit(has ? 0 : 1);
+            ' "${script_name}" >/dev/null 2>&1
+          }
+
+          if [[ -f "package.json" ]]; then
+            detected_stack=1
+
+            if [[ -n "${INSTALL_COMMAND}" ]]; then
+              run_cmd "install (override)" "${INSTALL_COMMAND}"
+            else
+              if [[ -f "package-lock.json" || -f "npm-shrinkwrap.json" ]]; then
+                run_cmd "install (npm ci)" "npm ci"
+              elif [[ -f "pnpm-lock.yaml" ]]; then
+                run_cmd "install (pnpm)" "corepack enable && pnpm install --frozen-lockfile"
+              elif [[ -f "yarn.lock" ]]; then
+                run_cmd "install (yarn)" "corepack enable && yarn install --immutable || yarn install --frozen-lockfile"
+              else
+                echo "No lockfile detected. Installing with npm install (non-deterministic fallback)."
+                run_cmd "install (npm install)" "npm install --no-audit --no-fund"
+              fi
+            fi
+
+            if [[ "${RUN_LINT}" == "true" ]]; then
+              if [[ -n "${LINT_COMMAND}" ]]; then
+                run_cmd "lint (override)" "${LINT_COMMAND}"
+                executed_checks=$((executed_checks + 1))
+              elif has_npm_script "lint"; then
+                run_cmd "lint" "npm run lint"
+                executed_checks=$((executed_checks + 1))
+              else
+                echo "Lint requested but no npm lint script found. Skipping."
+              fi
+            fi
+
+            if [[ "${RUN_TESTS}" == "true" ]]; then
+              if [[ -n "${TEST_COMMAND}" ]]; then
+                run_cmd "test (override)" "${TEST_COMMAND}"
+                executed_checks=$((executed_checks + 1))
+              elif has_npm_script "test"; then
+                run_cmd "test" "npm test"
+                executed_checks=$((executed_checks + 1))
+              else
+                echo "Tests requested but no npm test script found. Skipping."
+              fi
+            fi
+
+            if [[ "${RUN_BUILD}" == "true" ]]; then
+              if [[ -n "${BUILD_COMMAND}" ]]; then
+                run_cmd "build (override)" "${BUILD_COMMAND}"
+                executed_checks=$((executed_checks + 1))
+              elif has_npm_script "build"; then
+                run_cmd "build" "npm run build"
+                executed_checks=$((executed_checks + 1))
+              else
+                echo "Build requested but no npm build script found. Skipping."
+              fi
+            fi
+
+            if [[ "${RUN_SMOKE}" == "true" ]]; then
+              if [[ -n "${SMOKE_COMMAND}" ]]; then
+                run_cmd "smoke (override)" "${SMOKE_COMMAND}"
+                executed_checks=$((executed_checks + 1))
+              elif has_npm_script "smoke"; then
+                run_cmd "smoke" "npm run smoke"
+                executed_checks=$((executed_checks + 1))
+              else
+                echo "Smoke requested but no npm smoke script found. Skipping."
+              fi
+            fi
+          else
+            if [[ -n "${INSTALL_COMMAND}" ]]; then
+              run_cmd "install (override)" "${INSTALL_COMMAND}"
+            fi
+            if [[ "${RUN_LINT}" == "true" && -n "${LINT_COMMAND}" ]]; then
+              run_cmd "lint (override)" "${LINT_COMMAND}"
+              executed_checks=$((executed_checks + 1))
+            fi
+            if [[ "${RUN_TESTS}" == "true" && -n "${TEST_COMMAND}" ]]; then
+              run_cmd "test (override)" "${TEST_COMMAND}"
+              executed_checks=$((executed_checks + 1))
+            fi
+            if [[ "${RUN_BUILD}" == "true" && -n "${BUILD_COMMAND}" ]]; then
+              run_cmd "build (override)" "${BUILD_COMMAND}"
+              executed_checks=$((executed_checks + 1))
+            fi
+            if [[ "${RUN_SMOKE}" == "true" && -n "${SMOKE_COMMAND}" ]]; then
+              run_cmd "smoke (override)" "${SMOKE_COMMAND}"
+              executed_checks=$((executed_checks + 1))
+            fi
+          fi
+
+          if [[ "${detected_stack}" -eq 0 && -z "${INSTALL_COMMAND}" && -z "${LINT_COMMAND}" && -z "${TEST_COMMAND}" && -z "${BUILD_COMMAND}" && -z "${SMOKE_COMMAND}" ]]; then
+            echo "No known stack detected and no override commands provided."
+          fi
+
+          echo "Executed checks: ${executed_checks}"
+          if [[ "${FAIL_IF_NO_CHECKS}" == "true" && "${executed_checks}" -eq 0 ]]; then
+            echo "No quality checks were executed, failing as requested."
+            exit 1
+          fi

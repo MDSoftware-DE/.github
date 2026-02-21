@@ -1,0 +1,6 @@
+{
+  "name": "Quality Gate",
+  "description": "Run org baseline quality checks (lint, tests, build, optional smoke) on pull requests.",
+  "iconName": "check-circle",
+  "categories": ["Automation", "Continuous integration"]
+}

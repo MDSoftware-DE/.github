@@ -23,6 +23,11 @@ PR policy baseline:
 - Repo wrapper baseline: `docs/codex/workflows/policy-standards.yml`
 - Workflow template: `.github/workflow-templates/policy-standards.yml`
 
+Quality gate baseline:
+- Reusable workflow: `.github/workflows/quality-gate-reusable.yml`
+- Repo wrapper baseline: `docs/codex/workflows/quality-gate.yml`
+- Workflow template: `.github/workflow-templates/quality-gate.yml`
+
 Reusable skill package for Codex instances:
 - `codex/skills/org-agents-governance/SKILL.md`
 - `codex/skills/README.md`
