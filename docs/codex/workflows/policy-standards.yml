@@ -1,0 +1,22 @@
+name: policy/standards
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+      - ready_for_review
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  policy:
+    uses: MDSoftware-DE/.github/.github/workflows/policy-standards-reusable.yml@main
+    with:
+      require_issue_reference: true
+      require_english_checkbox: true
+      enforce_template_sections: true
