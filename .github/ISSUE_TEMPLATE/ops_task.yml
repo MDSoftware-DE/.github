@@ -3,17 +3,25 @@ about: Track deployment, reliability, or maintenance work
 labels: [operations]
 title: "[OPS] "
 body:
+  - type: checkboxes
+    id: language_confirmation
+    attributes:
+      label: Language
+      options:
+        - label: I confirm this issue is written in English.
+          required: true
   - type: textarea
     id: objective
     attributes:
       label: Objective
+      description: Please write in English.
     validations:
       required: true
   - type: textarea
     id: checklist
     attributes:
       label: Execution Checklist
-      description: Add concrete tasks and validation criteria
+      description: Add concrete tasks and validation criteria. Please write in English.
     validations:
       required: true
   - type: input

@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Language Policy (English)
+    url: https://github.com/MDSoftware-DE/.github/blob/main/CONTRIBUTING.md
+    about: Documentation and issues should be written in English.
   - name: Security Report
     url: https://github.com/MDSoftware-DE/nas-hulk-config/issues/new?title=%5BSECURITY%5D+
     about: Use a dedicated issue and avoid posting sensitive payload data.

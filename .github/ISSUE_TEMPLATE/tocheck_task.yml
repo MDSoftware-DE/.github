@@ -3,18 +3,25 @@ about: Track deferred follow-up and maintenance tasks
 labels: [tocheck]
 title: "[TOCHECK] "
 body:
+  - type: checkboxes
+    id: language_confirmation
+    attributes:
+      label: Language
+      options:
+        - label: I confirm this issue is written in English.
+          required: true
   - type: textarea
     id: context
     attributes:
       label: Context
-      description: Why this was deferred and what triggered it
+      description: Why this was deferred and what triggered it. Please write in English.
     validations:
       required: true
   - type: textarea
     id: action_items
     attributes:
       label: Action Items
-      description: Concrete tasks to complete this follow-up
+      description: Concrete tasks to complete this follow-up. Please write in English.
     validations:
       required: true
   - type: input
