@@ -20,3 +20,4 @@ Shared Codex standards and AGENTS baseline are maintained here:
 
 Reusable skill package for Codex instances:
 - `codex/skills/org-agents-governance/SKILL.md`
+- `codex/skills/README.md`
