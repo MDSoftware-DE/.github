@@ -10,6 +10,13 @@ English is the default and required language for all contribution-related conten
 
 If a local-language artifact is unavoidable, add an English summary in the same change.
 
+## AGENTS Baseline
+
+Active repositories should include `AGENTS.md` with the org baseline block from:
+- `docs/codex/AGENTS_BASELINE_BLOCK.md`
+
+Use `docs/codex/AGENTS_TEMPLATE.md` for new repositories.
+
 ## Issue Hygiene
 
 When opening issues:
