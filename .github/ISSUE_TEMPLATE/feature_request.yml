@@ -1,0 +1,24 @@
+name: Feature Request
+about: Propose an enhancement to quality, safety, or operations
+labels: [enhancement]
+title: "[FEATURE] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: Which operational or quality gap should be closed?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Solution
+      description: Include acceptance criteria and rollout constraints
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Expected effect on false positives, latency, and ops

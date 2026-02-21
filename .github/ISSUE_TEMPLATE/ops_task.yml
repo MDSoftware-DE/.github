@@ -1,0 +1,22 @@
+name: Ops Task
+about: Track deployment, reliability, or maintenance work
+labels: [operations]
+title: "[OPS] "
+body:
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+    validations:
+      required: true
+  - type: textarea
+    id: checklist
+    attributes:
+      label: Execution Checklist
+      description: Add concrete tasks and validation criteria
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Responsible Owner

@@ -1,0 +1,36 @@
+name: Bug Report
+about: Report a defect, regression, or safety issue
+labels: [bug]
+title: "[BUG] "
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened and why this is a problem?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Exact steps, sample message shape, and conditions
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+    validations:
+      required: true
+  - type: input
+    id: workflow_version
+    attributes:
+      label: Workflow Version ID
+      placeholder: e.g. cb8bb2a6-c51b-4385-9df3-660b587d254d

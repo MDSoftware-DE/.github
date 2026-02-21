@@ -1,0 +1,28 @@
+name: TOCHECK Task
+about: Track deferred follow-up and maintenance tasks
+labels: [tocheck]
+title: "[TOCHECK] "
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Why this was deferred and what triggered it
+    validations:
+      required: true
+  - type: textarea
+    id: action_items
+    attributes:
+      label: Action Items
+      description: Concrete tasks to complete this follow-up
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Responsible Owner
+  - type: input
+    id: target_date
+    attributes:
+      label: Target Date
+      placeholder: YYYY-MM-DD

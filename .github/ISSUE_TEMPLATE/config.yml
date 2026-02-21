@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security Report
+    url: https://github.com/MDSoftware-DE/nas-hulk-config/issues/new?title=%5BSECURITY%5D+
+    about: Use a dedicated issue and avoid posting sensitive payload data.
