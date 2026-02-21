@@ -18,6 +18,11 @@ Shared Codex standards and AGENTS baseline are maintained here:
 - `docs/codex/AGENTS_BASELINE_BLOCK.md`
 - `docs/codex/AGENTS_TEMPLATE.md`
 
+PR policy baseline:
+- Reusable workflow: `.github/workflows/policy-standards-reusable.yml`
+- Repo wrapper baseline: `docs/codex/workflows/policy-standards.yml`
+- Workflow template: `.github/workflow-templates/policy-standards.yml`
+
 Reusable skill package for Codex instances:
 - `codex/skills/org-agents-governance/SKILL.md`
 - `codex/skills/README.md`
