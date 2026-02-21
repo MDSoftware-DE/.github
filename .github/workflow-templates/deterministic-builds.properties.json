@@ -1,0 +1,6 @@
+{
+  "name": "Deterministic Builds",
+  "description": "Enforce lockfile-based deterministic dependency installs with pinned runtime and cache strategy.",
+  "iconName": "package",
+  "categories": ["Automation", "Continuous integration"]
+}

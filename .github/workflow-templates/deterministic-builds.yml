@@ -1,0 +1,26 @@
+name: deterministic-builds
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+      - ready_for_review
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deterministic-builds-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deterministic:
+    uses: MDSoftware-DE/.github/.github/workflows/deterministic-builds-reusable.yml@main
+    with:
+      node_version: "20"
+      enforce_lockfile: true
+      verify_lockfile_clean: true

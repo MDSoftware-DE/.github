@@ -1,0 +1,158 @@
+name: deterministic-builds (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        description: Pinned Node.js version for deterministic dependency installs
+        required: false
+        default: "20"
+        type: string
+      enforce_lockfile:
+        description: Fail when package.json exists without a supported lockfile
+        required: false
+        default: true
+        type: boolean
+      verify_lockfile_clean:
+        description: Fail if lockfile changes during install
+        required: false
+        default: true
+        type: boolean
+      install_command:
+        description: Optional install command override
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic-builds:
+    name: deterministic-builds
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect Node package manager and lockfile
+        id: detect
+        shell: bash
+        env:
+          ENFORCE_LOCKFILE: ${{ inputs.enforce_lockfile }}
+        run: |
+          set -euo pipefail
+
+          has_package_json=false
+          if [[ -f "package.json" ]]; then
+            has_package_json=true
+          fi
+
+          manager=""
+          lockfile=""
+          if [[ -f "package-lock.json" || -f "npm-shrinkwrap.json" ]]; then
+            manager="npm"
+            if [[ -f "package-lock.json" ]]; then
+              lockfile="package-lock.json"
+            else
+              lockfile="npm-shrinkwrap.json"
+            fi
+          elif [[ -f "pnpm-lock.yaml" ]]; then
+            manager="pnpm"
+            lockfile="pnpm-lock.yaml"
+          elif [[ -f "yarn.lock" ]]; then
+            manager="yarn"
+            lockfile="yarn.lock"
+          fi
+
+          if [[ "$has_package_json" == "true" && -z "$manager" && "${ENFORCE_LOCKFILE}" == "true" ]]; then
+            echo "package.json found but no supported lockfile (package-lock.json, npm-shrinkwrap.json, pnpm-lock.yaml, yarn.lock)."
+            exit 1
+          fi
+
+          if [[ -n "$manager" ]]; then
+            echo "has_node=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_node=false" >> "$GITHUB_OUTPUT"
+          fi
+          echo "manager=$manager" >> "$GITHUB_OUTPUT"
+          echo "lockfile=$lockfile" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node.js (npm)
+        if: ${{ steps.detect.outputs.has_node == 'true' && steps.detect.outputs.manager == 'npm' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            npm-shrinkwrap.json
+
+      - name: Setup Node.js (pnpm)
+        if: ${{ steps.detect.outputs.has_node == 'true' && steps.detect.outputs.manager == 'pnpm' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Setup Node.js (yarn)
+        if: ${{ steps.detect.outputs.has_node == 'true' && steps.detect.outputs.manager == 'yarn' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: yarn
+          cache-dependency-path: yarn.lock
+
+      - name: Install dependencies deterministically
+        if: ${{ steps.detect.outputs.has_node == 'true' }}
+        shell: bash
+        env:
+          INSTALL_COMMAND: ${{ inputs.install_command }}
+          NODE_MANAGER: ${{ steps.detect.outputs.manager }}
+        run: |
+          set -euo pipefail
+
+          if [[ -n "${INSTALL_COMMAND}" ]]; then
+            echo "Using custom install command."
+            bash -lc "${INSTALL_COMMAND}"
+            exit 0
+          fi
+
+          case "${NODE_MANAGER}" in
+            npm)
+              npm ci
+              ;;
+            pnpm)
+              corepack enable
+              pnpm install --frozen-lockfile
+              ;;
+            yarn)
+              corepack enable
+              yarn install --immutable || yarn install --frozen-lockfile
+              ;;
+            *)
+              echo "No supported Node package manager detected."
+              exit 1
+              ;;
+          esac
+
+      - name: Verify lockfile unchanged after install
+        if: ${{ steps.detect.outputs.has_node == 'true' && inputs.verify_lockfile_clean }}
+        shell: bash
+        env:
+          LOCKFILE: ${{ steps.detect.outputs.lockfile }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${LOCKFILE}" ]]; then
+            echo "No lockfile detected."
+            exit 1
+          fi
+          git update-index -q --refresh
+          git diff --exit-code -- "${LOCKFILE}"
+
+      - name: Report when no Node project is present
+        if: ${{ steps.detect.outputs.has_node != 'true' }}
+        shell: bash
+        run: |
+          echo "No Node project detected. Deterministic Node build checks skipped."

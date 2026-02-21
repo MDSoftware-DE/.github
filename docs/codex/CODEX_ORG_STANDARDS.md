@@ -16,6 +16,7 @@ Each active repository should contain:
 - `.github/workflows/policy-standards.yml` aligned with `docs/codex/workflows/policy-standards.yml`
 - `.github/workflows/quality-gate.yml` aligned with `docs/codex/workflows/quality-gate.yml`
 - `.github/workflows/security-checks.yml` aligned with `docs/codex/workflows/security-checks.yml`
+- `.github/workflows/deterministic-builds.yml` aligned with `docs/codex/workflows/deterministic-builds.yml`
 - `pull_request_template.md` and `CONTRIBUTING.md` aligned with org defaults
 
 ## Enforcement Model
@@ -26,6 +27,8 @@ Each active repository should contain:
   - `.github/workflows/quality-gate-reusable.yml`
 - Reusable security checks workflow source:
   - `.github/workflows/security-checks-reusable.yml`
+- Reusable deterministic builds workflow source:
+  - `.github/workflows/deterministic-builds-reusable.yml`
 - Drift detection workflows run from `MDSoftware-DE/nas-hulk-config` and open TOCHECK issues per repository.
 - Branch protection baseline is applied where GitHub plan features permit it.
   - Public repositories: enforced.
@@ -36,6 +39,7 @@ Each active repository should contain:
 2. Add `.github/workflows/policy-standards.yml` from `docs/codex/workflows/policy-standards.yml`.
 3. Add `.github/workflows/quality-gate.yml` from `docs/codex/workflows/quality-gate.yml`.
 4. Add `.github/workflows/security-checks.yml` from `docs/codex/workflows/security-checks.yml`.
-5. Confirm issue templates come from org defaults.
-6. Keep `pull_request_template.md` and `CONTRIBUTING.md` aligned with org defaults.
-7. Create the first TOCHECK issue only if intentional deviations are required.
+5. Add `.github/workflows/deterministic-builds.yml` from `docs/codex/workflows/deterministic-builds.yml`.
+6. Confirm issue templates come from org defaults.
+7. Keep `pull_request_template.md` and `CONTRIBUTING.md` aligned with org defaults.
+8. Create the first TOCHECK issue only if intentional deviations are required.

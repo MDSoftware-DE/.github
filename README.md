@@ -33,6 +33,11 @@ Security baseline:
 - Repo wrapper baseline: `docs/codex/workflows/security-checks.yml`
 - Workflow template: `.github/workflow-templates/security-checks.yml`
 
+Deterministic build baseline:
+- Reusable workflow: `.github/workflows/deterministic-builds-reusable.yml`
+- Repo wrapper baseline: `docs/codex/workflows/deterministic-builds.yml`
+- Workflow template: `.github/workflow-templates/deterministic-builds.yml`
+
 Reusable skill package for Codex instances:
 - `codex/skills/org-agents-governance/SKILL.md`
 - `codex/skills/README.md`
