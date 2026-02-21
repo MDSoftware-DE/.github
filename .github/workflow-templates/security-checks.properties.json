@@ -1,0 +1,6 @@
+{
+  "name": "Security Checks",
+  "description": "Run org baseline security checks (dependency review, CodeQL, and secret scanning) on pull requests.",
+  "iconName": "shield",
+  "categories": ["Automation", "Security"]
+}

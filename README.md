@@ -28,6 +28,11 @@ Quality gate baseline:
 - Repo wrapper baseline: `docs/codex/workflows/quality-gate.yml`
 - Workflow template: `.github/workflow-templates/quality-gate.yml`
 
+Security baseline:
+- Reusable workflow: `.github/workflows/security-checks-reusable.yml`
+- Repo wrapper baseline: `docs/codex/workflows/security-checks.yml`
+- Workflow template: `.github/workflow-templates/security-checks.yml`
+
 Reusable skill package for Codex instances:
 - `codex/skills/org-agents-governance/SKILL.md`
 - `codex/skills/README.md`

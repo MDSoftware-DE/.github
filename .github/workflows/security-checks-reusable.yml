@@ -1,0 +1,201 @@
+name: security-checks (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      run_dependency_review:
+        description: Run dependency review on pull requests
+        required: false
+        default: true
+        type: boolean
+      run_codeql:
+        description: Run CodeQL analysis
+        required: false
+        default: true
+        type: boolean
+      run_secret_scan:
+        description: Run secret scan with gitleaks
+        required: false
+        default: true
+        type: boolean
+      codeql_languages:
+        description: Comma-separated CodeQL languages (supported in baseline: javascript-typescript,python)
+        required: false
+        default: "javascript-typescript,python"
+        type: string
+      fail_on_secret_findings:
+        description: Fail job when gitleaks findings are present
+        required: false
+        default: true
+        type: boolean
+      dependency_fail_on_severity:
+        description: Minimum severity for dependency review failure
+        required: false
+        default: high
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-review:
+    name: dependency-review
+    if: ${{ inputs.run_dependency_review && github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Dependency review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: ${{ inputs.dependency_fail_on_severity }}
+
+  resolve-codeql-languages:
+    name: resolve-codeql-languages
+    if: ${{ inputs.run_codeql }}
+    runs-on: ubuntu-latest
+    outputs:
+      has_languages: ${{ steps.resolve.outputs.has_languages }}
+      languages: ${{ steps.resolve.outputs.languages }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve CodeQL languages from repository
+        id: resolve
+        shell: bash
+        env:
+          CODEQL_LANGUAGES: ${{ inputs.codeql_languages }}
+        run: |
+          set -euo pipefail
+
+          normalize() {
+            printf "%s" "$1" | tr '[:upper:]' '[:lower:]' | sed 's/^ *//;s/ *$//'
+          }
+
+          has_js=false
+          has_py=false
+
+          if git ls-files '*.js' '*.jsx' '*.mjs' '*.cjs' '*.ts' '*.tsx' | grep -q '.'; then
+            has_js=true
+          fi
+          if git ls-files '*.py' | grep -q '.'; then
+            has_py=true
+          fi
+
+          include_js=false
+          include_py=false
+
+          IFS=',' read -r -a requested <<< "${CODEQL_LANGUAGES}"
+          for raw in "${requested[@]}"; do
+            lang="$(normalize "$raw")"
+            case "$lang" in
+              javascript-typescript)
+                if [[ "$has_js" == "true" ]]; then
+                  include_js=true
+                fi
+                ;;
+              python)
+                if [[ "$has_py" == "true" ]]; then
+                  include_py=true
+                fi
+                ;;
+            esac
+          done
+
+          languages=()
+          if [[ "$include_js" == "true" ]]; then
+            languages+=("javascript-typescript")
+          fi
+          if [[ "$include_py" == "true" ]]; then
+            languages+=("python")
+          fi
+
+          if [[ "${#languages[@]}" -eq 0 ]]; then
+            echo "has_languages=false" >> "$GITHUB_OUTPUT"
+            echo "languages=[]" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          languages_json="$(printf '%s\n' "${languages[@]}" | jq -R . | jq -s -c .)"
+          echo "has_languages=true" >> "$GITHUB_OUTPUT"
+          echo "languages=${languages_json}" >> "$GITHUB_OUTPUT"
+
+  codeql:
+    name: codeql (${{ matrix.language }})
+    needs: resolve-codeql-languages
+    if: ${{ inputs.run_codeql && needs.resolve-codeql-languages.outputs.has_languages == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ${{ fromJSON(needs.resolve-codeql-languages.outputs.languages) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
+
+  secret-scan:
+    name: secret-scan
+    if: ${{ inputs.run_secret_scan }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install gitleaks
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="8.24.2"
+          curl -sSL "https://github.com/gitleaks/gitleaks/releases/download/v${VERSION}/gitleaks_${VERSION}_linux_x64.tar.gz" -o /tmp/gitleaks.tgz
+          tar -xzf /tmp/gitleaks.tgz -C /tmp
+          sudo install -m 0755 /tmp/gitleaks /usr/local/bin/gitleaks
+          gitleaks version
+
+      - name: Run gitleaks
+        shell: bash
+        run: |
+          set -euo pipefail
+          gitleaks dir . --redact --report-format sarif --report-path gitleaks.sarif
+
+      - name: Upload SARIF
+        if: ${{ always() && hashFiles('gitleaks.sarif') != '' }}
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: gitleaks.sarif
+
+      - name: Enforce findings policy
+        if: ${{ always() && hashFiles('gitleaks.sarif') != '' }}
+        shell: bash
+        env:
+          FAIL_ON_SECRET_FINDINGS: ${{ inputs.fail_on_secret_findings }}
+        run: |
+          set -euo pipefail
+          findings="$(jq '[.runs[].results[]?] | length' gitleaks.sarif)"
+          echo "Secret findings: ${findings}"
+          if [[ "${FAIL_ON_SECRET_FINDINGS}" == "true" && "${findings}" -gt 0 ]]; then
+            echo "Failing due to secret findings."
+            exit 1
+          fi

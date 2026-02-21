@@ -1,0 +1,29 @@
+name: security-checks
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+      - ready_for_review
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-checks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  security:
+    uses: MDSoftware-DE/.github/.github/workflows/security-checks-reusable.yml@main
+    with:
+      run_dependency_review: true
+      run_codeql: true
+      run_secret_scan: true
+      codeql_languages: "javascript-typescript,python"
+      fail_on_secret_findings: true
+      dependency_fail_on_severity: high
