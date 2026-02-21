@@ -1,0 +1,6 @@
+{
+  "name": "Policy Standards",
+  "description": "Run org policy checks for PR structure, issue references, and English confirmation.",
+  "iconName": "shield",
+  "categories": ["Automation", "Code quality"]
+}
