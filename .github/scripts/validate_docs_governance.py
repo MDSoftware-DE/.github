@@ -12,6 +12,10 @@ import re
 from pathlib import Path
 
 MERMAID_BLOCK_RE = re.compile(r"```mermaid\s*\n(.*?)\n```", re.IGNORECASE | re.DOTALL)
+STATE_CLASSDEF_NAME_RE = re.compile(
+    r"(entry|ingress|start|open|queue|active|progress|work|review|wait|hold|success|done|complete|resolved|warning|warn|error|fail|cancel|terminal|end|closed|unknown)",
+    re.IGNORECASE,
+)
 
 
 def parse_bool(value: str) -> bool:
@@ -62,12 +66,25 @@ def check_flowchart_colors(block: str) -> bool:
     return classdef_count >= 1 and (has_class_assign or has_style)
 
 
-def check_state_diagram_colors(block: str) -> bool:
-    classdef_count = len(re.findall(r"^\s*classDef\s+", block, re.MULTILINE))
-    has_class_assign = re.search(r"^\s*class\s+", block, re.MULTILINE) is not None
-    has_style = re.search(r"^\s*style\s+", block, re.MULTILINE) is not None
-    # State diagrams should use at least two semantic color groups.
-    return classdef_count >= 2 and (has_class_assign or has_style)
+def check_state_diagram_colors(block: str) -> tuple[bool, str | None]:
+    classdef_names = re.findall(r"^\s*classDef\s+([A-Za-z0-9_-]+)\b", block, re.MULTILINE)
+    class_assign_count = len(re.findall(r"^\s*class\s+.+$", block, re.MULTILINE))
+    style_count = len(re.findall(r"^\s*style\s+.+$", block, re.MULTILINE))
+    semantic_name_count = sum(1 for name in classdef_names if STATE_CLASSDEF_NAME_RE.search(name))
+
+    if len(classdef_names) < 3:
+        return False, "state diagrams require at least 3 classDef semantic color groups"
+
+    if class_assign_count + style_count < 2:
+        return False, "state diagrams require grouped class/style assignments for mapped states"
+
+    if semantic_name_count < 2:
+        return (
+            False,
+            "state classDef names must be semantic (for example: entry, active, review, success, error, terminal)",
+        )
+
+    return True, None
 
 
 def check_sequence_numbering(block: str) -> tuple[bool, str | None]:
@@ -180,10 +197,12 @@ def main() -> int:
                     )
 
             if args.enforce_state_diagram_colors and kind in {"stateDiagram-v2", "stateDiagram"}:
-                if "docs/diagrams/" in rel.as_posix() and not check_state_diagram_colors(block):
-                    errors.append(
-                        f"{rel} block#{i}: state diagram in docs/diagrams requires semantic classDef + class/style colors"
-                    )
+                if "docs/diagrams/" in rel.as_posix():
+                    ok, reason = check_state_diagram_colors(block)
+                    if not ok:
+                        errors.append(
+                            f"{rel} block#{i}: {reason}"
+                        )
 
             if args.require_sequence_numbering and kind == "sequenceDiagram":
                 ok, reason = check_sequence_numbering(block)
