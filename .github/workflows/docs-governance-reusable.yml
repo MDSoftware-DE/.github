@@ -43,8 +43,18 @@ on:
         required: false
         default: true
         type: boolean
+      enforce_sequence_colors:
+        description: Require colored box/rect visual grouping in docs/diagrams sequence diagrams
+        required: false
+        default: true
+        type: boolean
       require_sequence_numbering:
         description: Require sequence numbering via autonumber or N. prefixes
+        required: false
+        default: true
+        type: boolean
+      enforce_er_diagram_colors:
+        description: Require classDef default or classDef + class/style color mapping in docs/diagrams er diagrams
         required: false
         default: true
         type: boolean
@@ -107,5 +117,7 @@ jobs:
             --enforce-mermaid-no-newline-escape "${{ inputs.enforce_mermaid_no_newline_escape }}" \
             --enforce-flowchart-color-classes "${{ inputs.enforce_flowchart_color_classes }}" \
             --enforce-state-diagram-colors "${{ inputs.enforce_state_diagram_colors }}" \
+            --enforce-sequence-colors "${{ inputs.enforce_sequence_colors }}" \
             --require-sequence-numbering "${{ inputs.require_sequence_numbering }}" \
+            --enforce-er-diagram-colors "${{ inputs.enforce_er_diagram_colors }}" \
             --fail-if-no-mermaid "${{ inputs.fail_if_no_mermaid }}"
