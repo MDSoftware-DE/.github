@@ -34,6 +34,7 @@ When legacy flat files exist (for example `docs/architecture.md`), keep them lin
 - Do not use `\\n` escape sequences in Mermaid labels.
 - Use color mapping in flowcharts (`classDef` + `class`/`style`) for key domains.
 - State diagrams must define at least 3 semantic color groups with `classDef`, map states with grouped `class`/`style` assignments, and use semantic class names.
+- For better GitHub renderer compatibility in state diagrams, prefer explicit state aliases (`state "Label" as id`) and optional inline class markers (`id:::class`).
 - Sequence diagrams must use `autonumber` or explicit contiguous prefixes (`1.`, `2.`, ...).
 - Prefer diagrams under `docs/diagrams/` and keep them renderer-safe for GitHub.
 
@@ -52,12 +53,17 @@ Mermaid snippet:
 
 ```mermaid
 stateDiagram-v2
-  [*] --> open
-  open --> in_progress
-  in_progress --> done
-  in_progress --> failed
-  failed --> open
-  done --> [*]
+  state "Open" as open
+  state "In Progress" as in_progress
+  state "Done" as done
+  state "Failed" as failed
+
+  [*] --> open:::entry
+  open:::entry --> in_progress:::active
+  in_progress:::active --> done:::success
+  in_progress:::active --> failed:::error
+  failed:::error --> open:::entry
+  done:::success --> [*]
 
   classDef entry fill:#E3F2FD,stroke:#1565C0,color:#0D47A1;
   classDef active fill:#E0F2F1,stroke:#00695C,color:#004D40;
