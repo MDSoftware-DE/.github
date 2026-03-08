@@ -36,7 +36,8 @@ When legacy flat files exist (for example `docs/architecture.md`), keep them lin
 - Use color mapping in flowcharts (`classDef` + `class`/`style`) for key domains.
 - State diagrams must define at least 3 semantic color groups with `classDef`, map states with grouped `class`/`style` assignments, and use semantic class names.
 - For better GitHub renderer compatibility in state diagrams, prefer explicit state aliases (`state "Label" as id`) and optional inline class markers (`id:::class`).
-- Sequence diagrams must use `autonumber` or explicit contiguous prefixes (`1.`, `2.`, ...).
+- Sequence diagrams must use `autonumber` or explicit contiguous prefixes (`1.`, `2.`, ...), plus colored visual grouping with `rect` or `box`.
+- ER diagrams must define color styling via `classDef default` or `classDef` + grouped `class`/`style` assignments.
 - Prefer diagrams under `docs/diagrams/` and keep them renderer-safe for GitHub.
 
 ## State Diagram Styling Guide
@@ -75,6 +76,56 @@ stateDiagram-v2
   class in_progress active;
   class done success;
   class failed error;
+```
+
+## Sequence Diagram Styling Guide
+Use visual grouping to make participant phases readable.
+
+Recommended baseline:
+- Use `autonumber`.
+- Use at least one colored `rect` (or colored `box`) block.
+- Keep interaction labels concise and deterministic.
+
+Mermaid snippet:
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor User
+  participant API
+  participant DB
+
+  rect rgb(236, 246, 255)
+    User->>API: submit request
+    API->>DB: persist record
+    DB-->>API: ok
+    API-->>User: accepted
+  end
+```
+
+## ER Diagram Styling Guide
+Use semantic table group colors to separate business objects from lookup and audit entities.
+
+Recommended baseline classes:
+- `core`: `fill:#E3F2FD,stroke:#1565C0,color:#0D47A1`
+- `reference`: `fill:#E8F5E9,stroke:#2E7D32,color:#1B5E20`
+- `event`: `fill:#FFF8E1,stroke:#F9A825,color:#795548`
+
+Mermaid snippet:
+
+```mermaid
+erDiagram
+  ACCOUNT ||--o{ CONTACT : has
+  ACCOUNT ||--o{ CALL_EVENT : logs
+  STATUS_LOOKUP ||--o{ CALL_EVENT : categorizes
+
+  classDef core fill:#E3F2FD,stroke:#1565C0,color:#0D47A1;
+  classDef reference fill:#E8F5E9,stroke:#2E7D32,color:#1B5E20;
+  classDef event fill:#FFF8E1,stroke:#F9A825,color:#795548;
+
+  class ACCOUNT,CONTACT core;
+  class STATUS_LOOKUP reference;
+  class CALL_EVENT event;
 ```
 
 ## Enforcement Model

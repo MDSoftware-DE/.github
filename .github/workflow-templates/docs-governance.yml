@@ -29,5 +29,7 @@ jobs:
       enforce_mermaid_no_newline_escape: true
       enforce_flowchart_color_classes: true
       enforce_state_diagram_colors: true
+      enforce_sequence_colors: true
       require_sequence_numbering: true
+      enforce_er_diagram_colors: true
       fail_if_no_mermaid: false

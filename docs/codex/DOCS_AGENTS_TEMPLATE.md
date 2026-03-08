@@ -22,7 +22,8 @@ This file defines documentation and diagram quality rules for this repository.
   - use semantic class names (for example: `entry`, `active`, `review`, `success`, `error`, `terminal`)
   - map states with grouped `class` assignments and prefer explicit state aliases (`state "Label" as id`)
   - use inline `:::class` markers where needed for GitHub renderer compatibility
-- Sequence diagrams must use `autonumber` or explicit contiguous labels (`1.`, `2.`, ...).
+- Sequence diagrams must use `autonumber` or explicit contiguous labels (`1.`, `2.`, ...), and include colored visual grouping via `rect` or `box`.
+- ER diagrams must include color styling via `classDef default` or semantic `classDef` + grouped `class` assignments.
 - Prefer simple GitHub-compatible Mermaid syntax.
 
 ## Change Rules

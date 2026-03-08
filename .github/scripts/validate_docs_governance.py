@@ -87,6 +87,21 @@ def check_state_diagram_colors(block: str) -> tuple[bool, str | None]:
     return True, None
 
 
+def check_sequence_colors(block: str) -> tuple[bool, str | None]:
+    has_box_color = (
+        re.search(r"^\s*box\s+(?:rgb\(|#[0-9A-Fa-f]{3,8})", block, re.MULTILINE) is not None
+    )
+    has_rect_color = (
+        re.search(r"^\s*rect\s+(?:rgb\(|#[0-9A-Fa-f]{3,8})", block, re.MULTILINE) is not None
+    )
+    if not (has_box_color or has_rect_color):
+        return (
+            False,
+            "sequence diagrams in docs/diagrams require visual grouping via colored box/rect",
+        )
+    return True, None
+
+
 def check_sequence_numbering(block: str) -> tuple[bool, str | None]:
     lines = [line.rstrip() for line in block.splitlines()]
 
@@ -131,6 +146,26 @@ def check_sequence_numbering(block: str) -> tuple[bool, str | None]:
     return True, None
 
 
+def check_er_diagram_colors(block: str) -> tuple[bool, str | None]:
+    has_default_classdef = (
+        re.search(r"^\s*classDef\s+default\b", block, re.MULTILINE) is not None
+    )
+    classdef_count = len(re.findall(r"^\s*classDef\s+", block, re.MULTILINE))
+    has_class_assign = re.search(r"^\s*class\s+", block, re.MULTILINE) is not None
+    has_style = re.search(r"^\s*style\s+", block, re.MULTILINE) is not None
+
+    if has_default_classdef:
+        return True, None
+
+    if classdef_count >= 1 and (has_class_assign or has_style):
+        return True, None
+
+    return (
+        False,
+        "er diagrams in docs/diagrams require classDef default or classDef + class/style color mapping",
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate docs governance baseline")
     parser.add_argument("--docs-root", default="docs")
@@ -141,6 +176,8 @@ def main() -> int:
     parser.add_argument("--enforce-mermaid-no-newline-escape", type=parse_bool, default=True)
     parser.add_argument("--enforce-flowchart-color-classes", type=parse_bool, default=True)
     parser.add_argument("--enforce-state-diagram-colors", type=parse_bool, default=True)
+    parser.add_argument("--enforce-sequence-colors", type=parse_bool, default=True)
+    parser.add_argument("--enforce-er-diagram-colors", type=parse_bool, default=True)
     parser.add_argument("--require-sequence-numbering", type=parse_bool, default=True)
     parser.add_argument("--fail-if-no-mermaid", type=parse_bool, default=False)
     args = parser.parse_args()
@@ -200,14 +237,24 @@ def main() -> int:
                 if "docs/diagrams/" in rel.as_posix():
                     ok, reason = check_state_diagram_colors(block)
                     if not ok:
-                        errors.append(
-                            f"{rel} block#{i}: {reason}"
-                        )
+                        errors.append(f"{rel} block#{i}: {reason}")
+
+            if args.enforce_sequence_colors and kind == "sequenceDiagram":
+                if "docs/diagrams/" in rel.as_posix():
+                    ok, reason = check_sequence_colors(block)
+                    if not ok:
+                        errors.append(f"{rel} block#{i}: {reason}")
 
             if args.require_sequence_numbering and kind == "sequenceDiagram":
                 ok, reason = check_sequence_numbering(block)
                 if not ok:
                     errors.append(f"{rel} block#{i}: {reason}")
+
+            if args.enforce_er_diagram_colors and kind == "erDiagram":
+                if "docs/diagrams/" in rel.as_posix():
+                    ok, reason = check_er_diagram_colors(block)
+                    if not ok:
+                        errors.append(f"{rel} block#{i}: {reason}")
 
     if args.fail_if_no_mermaid and total_mermaid_blocks == 0:
         errors.append("No Mermaid diagrams found in scanned docs markdown files")
