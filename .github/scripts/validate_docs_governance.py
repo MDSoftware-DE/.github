@@ -160,10 +160,29 @@ def check_er_diagram_colors(block: str) -> tuple[bool, str | None]:
     if classdef_count >= 1 and (has_class_assign or has_style):
         return True, None
 
+    if has_style:
+        return True, None
+
     return (
         False,
-        "er diagrams in docs/diagrams require classDef default or classDef + class/style color mapping",
+        "er diagrams in docs/diagrams require classDef default, classDef + class/style mapping, or explicit style mapping",
     )
+
+
+def check_er_diagram_github_compat(block: str) -> tuple[bool, str | None]:
+    if re.search(r"^\s*(?:classDef|style)\s+.*\bstroke-width\s*:", block, re.MULTILINE):
+        return (
+            False,
+            "er diagrams for GitHub compatibility must not use stroke-width in classDef/style (use fill/stroke/color only)",
+        )
+
+    if re.search(r"^\s*(?:classDef|style)\s+.*\bfont-weight\s*:", block, re.MULTILINE):
+        return (
+            False,
+            "er diagrams for GitHub compatibility must not use font-weight in classDef/style",
+        )
+
+    return True, None
 
 
 def main() -> int:
@@ -255,6 +274,9 @@ def main() -> int:
                     ok, reason = check_er_diagram_colors(block)
                     if not ok:
                         errors.append(f"{rel} block#{i}: {reason}")
+                    compat_ok, compat_reason = check_er_diagram_github_compat(block)
+                    if not compat_ok:
+                        errors.append(f"{rel} block#{i}: {compat_reason}")
 
     if args.fail_if_no_mermaid and total_mermaid_blocks == 0:
         errors.append("No Mermaid diagrams found in scanned docs markdown files")

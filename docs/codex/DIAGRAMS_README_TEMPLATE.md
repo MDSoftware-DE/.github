@@ -28,12 +28,13 @@ Use this directory for Mermaid diagrams and visual system views.
 - `terminal`: `fill:#ECEFF1,stroke:#546E7A,color:#263238`
 
 ## ER Diagram Standard
-- Use semantic classes for entity groups (for example: `core`, `reference`, `event`) or `classDef default`.
+- Use semantic classes for entity groups (for example: `core`, `lookup`, `event`) or `classDef default`.
 - Prefer grouped class assignment by entity family.
+- GitHub compatibility rule: in ER `classDef`/`style` statements use only `fill`, `stroke`, and `color` (no `stroke-width` or `font-weight`).
 
 ## Recommended ER Palette
 - `core`: `fill:#E3F2FD,stroke:#1565C0,color:#0D47A1`
-- `reference`: `fill:#E8F5E9,stroke:#2E7D32,color:#1B5E20`
+- `lookup`: `fill:#E8F5E9,stroke:#2E7D32,color:#1B5E20`
 - `event`: `fill:#FFF8E1,stroke:#F9A825,color:#795548`
 
 ## Notes

@@ -23,7 +23,7 @@ Required rules:
   - Flowcharts in `docs/diagrams/*` should use `classDef` + `class`/`style` color mapping.
   - State diagrams in `docs/diagrams/*` must define at least 3 semantic color groups with `classDef`, map states using grouped `class`/`style` assignments, use semantic class names (for example: `entry`, `active`, `review`, `success`, `error`, `terminal`), and should prefer explicit state aliases plus inline `:::class` markers for GitHub compatibility.
   - Sequence diagrams must use `autonumber` or explicit contiguous numeric prefixes (`1.`, `2.`, ...), plus colored visual grouping (`rect` or `box`).
-  - ER diagrams should use semantic color mapping (`classDef default` or semantic `classDef` + grouped `class`/`style` assignments).
+  - ER diagrams should use semantic color mapping (`classDef default`, semantic `classDef` + grouped `class`/`style`, or explicit `style` mapping) and keep ER style tokens GitHub-safe (`fill`, `stroke`, `color`; avoid `stroke-width`/`font-weight`).
 - Keep this block unchanged so org automation can verify baseline adoption.
 
 <!-- MD-ORG-AGENTS-BASELINE:END -->

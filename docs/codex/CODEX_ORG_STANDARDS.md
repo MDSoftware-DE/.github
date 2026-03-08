@@ -37,7 +37,8 @@ When legacy flat files exist (for example `docs/architecture.md`), keep them lin
 - State diagrams must define at least 3 semantic color groups with `classDef`, map states with grouped `class`/`style` assignments, and use semantic class names.
 - For better GitHub renderer compatibility in state diagrams, prefer explicit state aliases (`state "Label" as id`) and optional inline class markers (`id:::class`).
 - Sequence diagrams must use `autonumber` or explicit contiguous prefixes (`1.`, `2.`, ...), plus colored visual grouping with `rect` or `box`.
-- ER diagrams must define color styling via `classDef default` or `classDef` + grouped `class`/`style` assignments.
+- ER diagrams must define color styling via `classDef default`, semantic `classDef` + grouped `class`/`style` assignments, or explicit per-entity `style` mapping.
+- For GitHub compatibility in ER diagrams, avoid `stroke-width` and `font-weight` in ER `classDef`/`style` statements; use `fill`, `stroke`, and `color`.
 - Prefer diagrams under `docs/diagrams/` and keep them renderer-safe for GitHub.
 
 ## State Diagram Styling Guide
@@ -108,7 +109,7 @@ Use semantic table group colors to separate business objects from lookup and aud
 
 Recommended baseline classes:
 - `core`: `fill:#E3F2FD,stroke:#1565C0,color:#0D47A1`
-- `reference`: `fill:#E8F5E9,stroke:#2E7D32,color:#1B5E20`
+- `lookup`: `fill:#E8F5E9,stroke:#2E7D32,color:#1B5E20`
 - `event`: `fill:#FFF8E1,stroke:#F9A825,color:#795548`
 
 Mermaid snippet:
@@ -119,13 +120,13 @@ erDiagram
   ACCOUNT ||--o{ CALL_EVENT : logs
   STATUS_LOOKUP ||--o{ CALL_EVENT : categorizes
 
-  classDef core fill:#E3F2FD,stroke:#1565C0,color:#0D47A1;
-  classDef reference fill:#E8F5E9,stroke:#2E7D32,color:#1B5E20;
-  classDef event fill:#FFF8E1,stroke:#F9A825,color:#795548;
+  classDef core fill:#E3F2FD,stroke:#1565C0,color:#0D47A1
+  classDef lookup fill:#E8F5E9,stroke:#2E7D32,color:#1B5E20
+  classDef event fill:#FFF8E1,stroke:#F9A825,color:#795548
 
-  class ACCOUNT,CONTACT core;
-  class STATUS_LOOKUP reference;
-  class CALL_EVENT event;
+  class ACCOUNT,CONTACT core
+  class STATUS_LOOKUP lookup
+  class CALL_EVENT event
 ```
 
 ## Enforcement Model

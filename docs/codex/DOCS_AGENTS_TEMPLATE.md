@@ -23,7 +23,8 @@ This file defines documentation and diagram quality rules for this repository.
   - map states with grouped `class` assignments and prefer explicit state aliases (`state "Label" as id`)
   - use inline `:::class` markers where needed for GitHub renderer compatibility
 - Sequence diagrams must use `autonumber` or explicit contiguous labels (`1.`, `2.`, ...), and include colored visual grouping via `rect` or `box`.
-- ER diagrams must include color styling via `classDef default` or semantic `classDef` + grouped `class` assignments.
+- ER diagrams must include color styling via `classDef default`, semantic `classDef` + grouped `class` assignments, or explicit `style` mapping.
+- For GitHub compatibility, ER style lines must use only `fill`, `stroke`, and `color` (avoid `stroke-width` and `font-weight`).
 - Prefer simple GitHub-compatible Mermaid syntax.
 
 ## Change Rules
