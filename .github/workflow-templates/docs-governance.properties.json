@@ -1,0 +1,9 @@
+{
+  "name": "docs-governance",
+  "description": "Validate docs structure and Mermaid quality conventions",
+  "iconName": "checklist",
+  "categories": [
+    "Documentation",
+    "Testing"
+  ]
+}

@@ -1,0 +1,31 @@
+name: docs-governance
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+      - ready_for_review
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-governance-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs-governance:
+    uses: MDSoftware-DE/.github/.github/workflows/docs-governance-reusable.yml@main
+    with:
+      docs_root: docs
+      require_docs_index: true
+      require_canonical_dirs: true
+      require_docs_agents: true
+      enforce_mermaid_no_newline_escape: true
+      enforce_flowchart_color_classes: true
+      require_sequence_numbering: true
+      fail_if_no_mermaid: false

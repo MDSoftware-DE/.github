@@ -38,6 +38,11 @@ Deterministic build baseline:
 - Repo wrapper baseline: `docs/codex/workflows/deterministic-builds.yml`
 - Workflow template: `.github/workflow-templates/deterministic-builds.yml`
 
+Documentation governance baseline:
+- Reusable workflow: `.github/workflows/docs-governance-reusable.yml`
+- Repo wrapper baseline: `docs/codex/workflows/docs-governance.yml`
+- Workflow template: `.github/workflow-templates/docs-governance.yml`
+
 Reusable skill package for Codex instances:
 - `codex/skills/org-agents-governance/SKILL.md`
 - `codex/skills/README.md`

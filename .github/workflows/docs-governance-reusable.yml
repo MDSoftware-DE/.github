@@ -1,0 +1,82 @@
+name: docs-governance (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      docs_root:
+        description: Root docs directory to validate
+        required: false
+        default: docs
+        type: string
+      require_docs_index:
+        description: Require docs/README.md or docs/index.md
+        required: false
+        default: true
+        type: boolean
+      require_canonical_dirs:
+        description: Require docs/diagrams, docs/runbooks, docs/architecture
+        required: false
+        default: true
+        type: boolean
+      require_docs_agents:
+        description: Require docs/AGENTS.md
+        required: false
+        default: true
+        type: boolean
+      enforce_mermaid_no_newline_escape:
+        description: Disallow \n escape sequences inside Mermaid blocks
+        required: false
+        default: true
+        type: boolean
+      enforce_flowchart_color_classes:
+        description: Require classDef + class/style in flowchart diagrams
+        required: false
+        default: true
+        type: boolean
+      require_sequence_numbering:
+        description: Require sequence numbering via autonumber or N. prefixes
+        required: false
+        default: true
+        type: boolean
+      fail_if_no_mermaid:
+        description: Fail if no Mermaid block exists under docs/
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  docs-governance:
+    name: docs-governance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target repository
+        uses: actions/checkout@v4
+
+      - name: Checkout org defaults repository
+        uses: actions/checkout@v4
+        with:
+          repository: MDSoftware-DE/.github
+          ref: main
+          path: _org_defaults
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate docs structure and Mermaid standards
+        shell: bash
+        run: |
+          set -euo pipefail
+          python _org_defaults/.github/scripts/validate_docs_governance.py \
+            --docs-root "${{ inputs.docs_root }}" \
+            --require-docs-index "${{ inputs.require_docs_index }}" \
+            --require-canonical-dirs "${{ inputs.require_canonical_dirs }}" \
+            --require-docs-agents "${{ inputs.require_docs_agents }}" \
+            --enforce-mermaid-no-newline-escape "${{ inputs.enforce_mermaid_no_newline_escape }}" \
+            --enforce-flowchart-color-classes "${{ inputs.enforce_flowchart_color_classes }}" \
+            --require-sequence-numbering "${{ inputs.require_sequence_numbering }}" \
+            --fail-if-no-mermaid "${{ inputs.fail_if_no_mermaid }}"
