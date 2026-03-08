@@ -9,19 +9,9 @@ from __future__ import annotations
 
 import argparse
 import re
-import sys
 from pathlib import Path
 
 MERMAID_BLOCK_RE = re.compile(r"```mermaid\s*\n(.*?)\n```", re.IGNORECASE | re.DOTALL)
-
-SEQUENCE_ARROW_TOKENS = (
-    "->",
-    "-->\",
-    "->>",
-    "-->>",
-    "-x",
-    "--x",
-    "-")
 
 
 def parse_bool(value: str) -> bool:
