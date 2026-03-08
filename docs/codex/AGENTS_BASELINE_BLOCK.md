@@ -12,7 +12,7 @@ Required rules:
 - Mermaid authoring baseline:
   - Never use `\\n` in Mermaid labels; use normal spaces.
   - Flowcharts in `docs/diagrams/*` should use `classDef` + `class`/`style` color mapping.
-  - State diagrams in `docs/diagrams/*` must define at least 3 semantic color groups with `classDef`, map states using grouped `class`/`style` assignments, and use semantic class names (for example: `entry`, `active`, `review`, `success`, `error`, `terminal`) instead of generic names like `c1`.
+  - State diagrams in `docs/diagrams/*` must define at least 3 semantic color groups with `classDef`, map states using grouped `class`/`style` assignments, use semantic class names (for example: `entry`, `active`, `review`, `success`, `error`, `terminal`), and should prefer explicit state aliases plus inline `:::class` markers for GitHub compatibility.
   - Sequence diagrams must use `autonumber` or explicit contiguous numeric prefixes (`1.`, `2.`, ...).
 - Keep this block unchanged so org automation can verify baseline adoption.
 
