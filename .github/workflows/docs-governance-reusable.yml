@@ -38,6 +38,11 @@ on:
         required: false
         default: true
         type: boolean
+      enforce_state_diagram_colors:
+        description: Require semantic classDef + class/style color mapping in docs/diagrams state diagrams
+        required: false
+        default: true
+        type: boolean
       require_sequence_numbering:
         description: Require sequence numbering via autonumber or N. prefixes
         required: false
@@ -101,5 +106,6 @@ jobs:
             --require-docs-agents "${{ inputs.require_docs_agents }}" \
             --enforce-mermaid-no-newline-escape "${{ inputs.enforce_mermaid_no_newline_escape }}" \
             --enforce-flowchart-color-classes "${{ inputs.enforce_flowchart_color_classes }}" \
+            --enforce-state-diagram-colors "${{ inputs.enforce_state_diagram_colors }}" \
             --require-sequence-numbering "${{ inputs.require_sequence_numbering }}" \
             --fail-if-no-mermaid "${{ inputs.fail_if_no_mermaid }}"

@@ -33,6 +33,7 @@ When legacy flat files exist (for example `docs/architecture.md`), keep them lin
 ## Mermaid Quality Baseline
 - Do not use `\\n` escape sequences in Mermaid labels.
 - Use color mapping in flowcharts (`classDef` + `class`/`style`) for key domains.
+- Use semantic color grouping in state diagrams (`classDef` + `class`/`style`) so state families are visually separated by intent (for example: entry, processing, success, warning/error, terminal).
 - Sequence diagrams must use `autonumber` or explicit contiguous prefixes (`1.`, `2.`, ...).
 - Prefer diagrams under `docs/diagrams/` and keep them renderer-safe for GitHub.
 

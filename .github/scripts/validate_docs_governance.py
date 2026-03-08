@@ -27,7 +27,7 @@ def iter_markdown_files(docs_root: Path) -> list[Path]:
     return sorted(p for p in docs_root.rglob("*.md") if p.is_file())
 
 
-def filter_markdown_files(repo_root: Path, docs_root: Path, files_from: Path, all_files: list[Path]) -> list[Path]:
+def filter_markdown_files(repo_root: Path, files_from: Path, all_files: list[Path]) -> list[Path]:
     all_set = {p.resolve() for p in all_files}
     selected: list[Path] = []
 
@@ -56,10 +56,18 @@ def first_non_empty_line(block: str) -> str:
 
 
 def check_flowchart_colors(block: str) -> bool:
-    has_classdef = re.search(r"^\s*classDef\s+", block, re.MULTILINE) is not None
+    classdef_count = len(re.findall(r"^\s*classDef\s+", block, re.MULTILINE))
     has_class_assign = re.search(r"^\s*class\s+", block, re.MULTILINE) is not None
     has_style = re.search(r"^\s*style\s+", block, re.MULTILINE) is not None
-    return has_classdef and (has_class_assign or has_style)
+    return classdef_count >= 1 and (has_class_assign or has_style)
+
+
+def check_state_diagram_colors(block: str) -> bool:
+    classdef_count = len(re.findall(r"^\s*classDef\s+", block, re.MULTILINE))
+    has_class_assign = re.search(r"^\s*class\s+", block, re.MULTILINE) is not None
+    has_style = re.search(r"^\s*style\s+", block, re.MULTILINE) is not None
+    # State diagrams should use at least two semantic color groups.
+    return classdef_count >= 2 and (has_class_assign or has_style)
 
 
 def check_sequence_numbering(block: str) -> tuple[bool, str | None]:
@@ -115,6 +123,7 @@ def main() -> int:
     parser.add_argument("--require-docs-agents", type=parse_bool, default=True)
     parser.add_argument("--enforce-mermaid-no-newline-escape", type=parse_bool, default=True)
     parser.add_argument("--enforce-flowchart-color-classes", type=parse_bool, default=True)
+    parser.add_argument("--enforce-state-diagram-colors", type=parse_bool, default=True)
     parser.add_argument("--require-sequence-numbering", type=parse_bool, default=True)
     parser.add_argument("--fail-if-no-mermaid", type=parse_bool, default=False)
     args = parser.parse_args()
@@ -145,7 +154,7 @@ def main() -> int:
         if args.files_from:
             files_from_path = (repo_root / args.files_from).resolve()
             if files_from_path.is_file():
-                markdown_files = filter_markdown_files(repo_root, docs_root, files_from_path, markdown_files)
+                markdown_files = filter_markdown_files(repo_root, files_from_path, markdown_files)
 
     total_mermaid_blocks = 0
 
@@ -164,11 +173,16 @@ def main() -> int:
                     f"{rel} block#{i}: do not use \\n escapes in Mermaid labels; use spaces"
                 )
 
-            # Only enforce color classes for architecture flowcharts in docs/diagrams.
             if args.enforce_flowchart_color_classes and kind in {"flowchart", "graph"}:
                 if "docs/diagrams/" in rel.as_posix() and not check_flowchart_colors(block):
                     errors.append(
                         f"{rel} block#{i}: flowchart in docs/diagrams requires classDef + class/style colors"
+                    )
+
+            if args.enforce_state_diagram_colors and kind in {"stateDiagram-v2", "stateDiagram"}:
+                if "docs/diagrams/" in rel.as_posix() and not check_state_diagram_colors(block):
+                    errors.append(
+                        f"{rel} block#{i}: state diagram in docs/diagrams requires semantic classDef + class/style colors"
                     )
 
             if args.require_sequence_numbering and kind == "sequenceDiagram":

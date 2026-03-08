@@ -28,5 +28,6 @@ jobs:
       require_docs_agents: true
       enforce_mermaid_no_newline_escape: true
       enforce_flowchart_color_classes: true
+      enforce_state_diagram_colors: true
       require_sequence_numbering: true
       fail_if_no_mermaid: false
