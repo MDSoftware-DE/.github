@@ -39,7 +39,7 @@ on:
         default: true
         type: boolean
       enforce_state_diagram_colors:
-        description: Require semantic classDef + class/style color mapping in docs/diagrams state diagrams
+        description: Require >=3 semantic classDef groups with grouped class/style mapping in docs/diagrams state diagrams
         required: false
         default: true
         type: boolean
