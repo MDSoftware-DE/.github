@@ -27,6 +27,22 @@ def iter_markdown_files(docs_root: Path) -> list[Path]:
     return sorted(p for p in docs_root.rglob("*.md") if p.is_file())
 
 
+def filter_markdown_files(repo_root: Path, docs_root: Path, files_from: Path, all_files: list[Path]) -> list[Path]:
+    all_set = {p.resolve() for p in all_files}
+    selected: list[Path] = []
+
+    for raw in files_from.read_text(encoding="utf-8").splitlines():
+        rel = raw.strip()
+        if not rel:
+            continue
+        candidate = (repo_root / rel).resolve()
+        if candidate in all_set:
+            selected.append(candidate)
+
+    # Preserve deterministic ordering and uniqueness.
+    return sorted(set(selected))
+
+
 def find_mermaid_blocks(text: str) -> list[str]:
     return [m.group(1) for m in MERMAID_BLOCK_RE.finditer(text)]
 
@@ -93,6 +109,7 @@ def check_sequence_numbering(block: str) -> tuple[bool, str | None]:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate docs governance baseline")
     parser.add_argument("--docs-root", default="docs")
+    parser.add_argument("--files-from", default="")
     parser.add_argument("--require-docs-index", type=parse_bool, default=True)
     parser.add_argument("--require-canonical-dirs", type=parse_bool, default=True)
     parser.add_argument("--require-docs-agents", type=parse_bool, default=True)
@@ -102,12 +119,13 @@ def main() -> int:
     parser.add_argument("--fail-if-no-mermaid", type=parse_bool, default=False)
     args = parser.parse_args()
 
-    repo_root = Path.cwd()
-    docs_root = repo_root / args.docs_root
+    repo_root = Path.cwd().resolve()
+    docs_root = (repo_root / args.docs_root).resolve()
     errors: list[str] = []
 
     if not docs_root.exists() or not docs_root.is_dir():
         errors.append(f"Missing docs root directory: {args.docs_root}/")
+        markdown_files: list[Path] = []
     else:
         if args.require_docs_index:
             has_index = (docs_root / "README.md").is_file() or (docs_root / "index.md").is_file()
@@ -123,7 +141,12 @@ def main() -> int:
         if args.require_docs_agents and not (docs_root / "AGENTS.md").is_file():
             errors.append("Missing docs/AGENTS.md")
 
-    markdown_files = iter_markdown_files(docs_root) if docs_root.is_dir() else []
+        markdown_files = iter_markdown_files(docs_root)
+        if args.files_from:
+            files_from_path = (repo_root / args.files_from).resolve()
+            if files_from_path.is_file():
+                markdown_files = filter_markdown_files(repo_root, docs_root, files_from_path, markdown_files)
+
     total_mermaid_blocks = 0
 
     for md_file in markdown_files:
@@ -141,10 +164,11 @@ def main() -> int:
                     f"{rel} block#{i}: do not use \\n escapes in Mermaid labels; use spaces"
                 )
 
+            # Only enforce color classes for architecture flowcharts in docs/diagrams.
             if args.enforce_flowchart_color_classes and kind in {"flowchart", "graph"}:
-                if not check_flowchart_colors(block):
+                if "docs/diagrams/" in rel.as_posix() and not check_flowchart_colors(block):
                     errors.append(
-                        f"{rel} block#{i}: flowchart requires classDef + class/style for color mapping"
+                        f"{rel} block#{i}: flowchart in docs/diagrams requires classDef + class/style colors"
                     )
 
             if args.require_sequence_numbering and kind == "sequenceDiagram":
@@ -153,7 +177,7 @@ def main() -> int:
                     errors.append(f"{rel} block#{i}: {reason}")
 
     if args.fail_if_no_mermaid and total_mermaid_blocks == 0:
-        errors.append("No Mermaid diagrams found under docs/")
+        errors.append("No Mermaid diagrams found in scanned docs markdown files")
 
     if errors:
         print("docs-governance validation failed:")

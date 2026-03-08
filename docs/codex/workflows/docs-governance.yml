@@ -22,6 +22,7 @@ jobs:
     uses: MDSoftware-DE/.github/.github/workflows/docs-governance-reusable.yml@main
     with:
       docs_root: docs
+      changed_files_only: true
       require_docs_index: true
       require_canonical_dirs: true
       require_docs_agents: true

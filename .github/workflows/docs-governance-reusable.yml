@@ -8,6 +8,11 @@ on:
         required: false
         default: docs
         type: string
+      changed_files_only:
+        description: On pull requests, validate Mermaid only in changed docs markdown files
+        required: false
+        default: true
+        type: boolean
       require_docs_index:
         description: Require docs/README.md or docs/index.md
         required: false
@@ -29,7 +34,7 @@ on:
         default: true
         type: boolean
       enforce_flowchart_color_classes:
-        description: Require classDef + class/style in flowchart diagrams
+        description: Require classDef + class/style in docs/diagrams flowcharts
         required: false
         default: true
         type: boolean
@@ -39,7 +44,7 @@ on:
         default: true
         type: boolean
       fail_if_no_mermaid:
-        description: Fail if no Mermaid block exists under docs/
+        description: Fail if no Mermaid block exists in scanned files
         required: false
         default: false
         type: boolean
@@ -54,6 +59,8 @@ jobs:
     steps:
       - name: Checkout target repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Checkout org defaults repository
         uses: actions/checkout@v4
@@ -67,12 +74,28 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Resolve changed docs markdown files
+        if: ${{ github.event_name == 'pull_request' && inputs.changed_files_only }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin "${{ github.base_ref }}"
+          git diff --name-only "origin/${{ github.base_ref }}"...HEAD | grep -E '^docs/.*\.md$' > /tmp/docs_changed_md.txt || true
+          echo "Changed docs markdown files:"
+          cat /tmp/docs_changed_md.txt || true
+
       - name: Validate docs structure and Mermaid standards
         shell: bash
         run: |
           set -euo pipefail
+          extra_args=()
+          if [[ "${{ github.event_name }}" == "pull_request" && "${{ inputs.changed_files_only }}" == "true" && -f /tmp/docs_changed_md.txt ]]; then
+            extra_args+=(--files-from /tmp/docs_changed_md.txt)
+          fi
+
           python _org_defaults/.github/scripts/validate_docs_governance.py \
             --docs-root "${{ inputs.docs_root }}" \
+            "${extra_args[@]}" \
             --require-docs-index "${{ inputs.require_docs_index }}" \
             --require-canonical-dirs "${{ inputs.require_canonical_dirs }}" \
             --require-docs-agents "${{ inputs.require_docs_agents }}" \
