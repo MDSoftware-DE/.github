@@ -12,7 +12,8 @@ English is the default language for:
 ## Required Repo Files
 Each active repository should contain:
 - `AGENTS.md` with the org baseline block from `docs/codex/AGENTS_BASELINE_BLOCK.md`
-- `docs/AGENTS.md` with repository-specific documentation and Mermaid authoring notes
+- `docs/AGENTS.md` with repository-specific documentation and Mermaid authoring notes (template: `docs/codex/DOCS_AGENTS_TEMPLATE.md`)
+- `docs/diagrams/README.md` with Mermaid style guidance (template: `docs/codex/DIAGRAMS_README_TEMPLATE.md`)
 - `.github/ISSUE_TEMPLATE/*` aligned with the org baseline
 - `.github/workflows/policy-standards.yml` aligned with `docs/codex/workflows/policy-standards.yml`
 - `.github/workflows/quality-gate.yml` aligned with `docs/codex/workflows/quality-gate.yml`
@@ -95,12 +96,13 @@ stateDiagram-v2
 
 ## Onboarding New Repositories
 1. Copy `docs/codex/AGENTS_TEMPLATE.md` to `<repo>/AGENTS.md`.
-2. Add `docs/AGENTS.md` with repo-specific documentation guidance.
-3. Add `.github/workflows/policy-standards.yml` from `docs/codex/workflows/policy-standards.yml`.
-4. Add `.github/workflows/quality-gate.yml` from `docs/codex/workflows/quality-gate.yml`.
-5. Add `.github/workflows/security-checks.yml` from `docs/codex/workflows/security-checks.yml`.
-6. Add `.github/workflows/deterministic-builds.yml` from `docs/codex/workflows/deterministic-builds.yml`.
-7. Add `.github/workflows/docs-governance.yml` from `docs/codex/workflows/docs-governance.yml`.
-8. Confirm issue templates come from org defaults.
-9. Keep `pull_request_template.md` and `CONTRIBUTING.md` aligned with org defaults.
-10. Create the first TOCHECK issue only if intentional deviations are required.
+2. Copy `docs/codex/DOCS_AGENTS_TEMPLATE.md` to `<repo>/docs/AGENTS.md`.
+3. Copy `docs/codex/DIAGRAMS_README_TEMPLATE.md` to `<repo>/docs/diagrams/README.md`.
+4. Add `.github/workflows/policy-standards.yml` from `docs/codex/workflows/policy-standards.yml`.
+5. Add `.github/workflows/quality-gate.yml` from `docs/codex/workflows/quality-gate.yml`.
+6. Add `.github/workflows/security-checks.yml` from `docs/codex/workflows/security-checks.yml`.
+7. Add `.github/workflows/deterministic-builds.yml` from `docs/codex/workflows/deterministic-builds.yml`.
+8. Add `.github/workflows/docs-governance.yml` from `docs/codex/workflows/docs-governance.yml`.
+9. Confirm issue templates come from org defaults.
+10. Keep `pull_request_template.md` and `CONTRIBUTING.md` aligned with org defaults.
+11. Create the first TOCHECK issue only if intentional deviations are required.
