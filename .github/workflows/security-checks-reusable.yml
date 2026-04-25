@@ -19,7 +19,7 @@ on:
         default: true
         type: boolean
       codeql_languages:
-        description: Comma-separated CodeQL languages (supported in baseline: javascript-typescript,python)
+        description: "Comma-separated CodeQL languages (supported in baseline: javascript-typescript,python)"
         required: false
         default: "javascript-typescript,python"
         type: string
@@ -33,6 +33,11 @@ on:
         required: false
         default: high
         type: string
+      runner_labels:
+        description: JSON string or array for the runner selection, for example '"ubuntu-latest"' or '["self-hosted","nightcrawler"]'
+        required: false
+        default: '"ubuntu-latest"'
+        type: string
 
 permissions:
   contents: read
@@ -41,7 +46,7 @@ jobs:
   dependency-review:
     name: dependency-review
     if: ${{ inputs.run_dependency_review && github.event_name == 'pull_request' }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(inputs.runner_labels) }}
     permissions:
       contents: read
       pull-requests: read
@@ -57,7 +62,7 @@ jobs:
   resolve-codeql-languages:
     name: resolve-codeql-languages
     if: ${{ inputs.run_codeql }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(inputs.runner_labels) }}
     outputs:
       has_languages: ${{ steps.resolve.outputs.has_languages }}
       languages: ${{ steps.resolve.outputs.languages }}
@@ -129,7 +134,7 @@ jobs:
     name: codeql (${{ matrix.language }})
     needs: resolve-codeql-languages
     if: ${{ inputs.run_codeql && needs.resolve-codeql-languages.outputs.has_languages == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(inputs.runner_labels) }}
     permissions:
       actions: read
       contents: read
@@ -156,7 +161,7 @@ jobs:
   secret-scan:
     name: secret-scan
     if: ${{ inputs.run_secret_scan }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(inputs.runner_labels) }}
     permissions:
       contents: read
       security-events: write

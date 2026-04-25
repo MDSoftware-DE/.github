@@ -18,6 +18,11 @@ on:
         required: false
         default: true
         type: boolean
+      runner_labels:
+        description: JSON string or array for the runner selection, for example '"ubuntu-latest"' or '["self-hosted","nightcrawler"]'
+        required: false
+        default: '"ubuntu-latest"'
+        type: string
 
 permissions:
   contents: read
@@ -26,7 +31,7 @@ permissions:
 jobs:
   validate:
     name: policy/standards
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(inputs.runner_labels) }}
     if: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request_target' }}
     steps:
       - name: Validate PR metadata policy
