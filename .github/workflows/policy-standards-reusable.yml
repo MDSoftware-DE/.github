@@ -35,7 +35,7 @@ jobs:
     if: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request_target' }}
     steps:
       - name: Validate PR metadata policy
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9.0.0
         env:
           REQUIRE_ISSUE_REFERENCE: ${{ inputs.require_issue_reference }}
           REQUIRE_ENGLISH_CHECKBOX: ${{ inputs.require_english_checkbox }}
