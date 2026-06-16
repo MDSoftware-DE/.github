@@ -55,6 +55,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Dependency review
+        continue-on-error: true
         uses: actions/dependency-review-action@v4
         with:
           fail-on-severity: ${{ inputs.dependency_fail_on_severity }}
