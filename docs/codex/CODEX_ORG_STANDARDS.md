@@ -129,6 +129,33 @@ erDiagram
   class CALL_EVENT event
 ```
 
+## Security Workflow Operation
+
+### Purpose
+
+Provide a meaningful shared security gate for public, licensed private, and GitHub Free private repositories without treating unavailable paid features as successful checks.
+
+### Current Status Snapshot
+
+- The default wrapper uses Semgrep Community Edition with `p/default` and local SARIF enforcement.
+- Pull requests compare Semgrep findings with the pull request base commit, so new findings fail without silently accepting them.
+- Gitleaks runs and enforces findings locally; SARIF upload is disabled by default.
+- GitHub dependency review and CodeQL remain available as explicit opt-ins for public repositories or private repositories licensed for GitHub Code Security.
+- The default wrapper runs on pull requests and manual dispatch. It does not add a default-branch push trigger, which conserves included GitHub Actions minutes. Dependabot alerts remain the default-branch dependency monitor; manual dispatch performs a full Semgrep scan.
+- No Semgrep account, application token, or paid GitHub security feature is required for the default path.
+
+### Last Change
+
+On 2026-07-16, the shared workflow added a Semgrep Community Edition v1.170.0 path with a synthetic fail control, pull-request baseline comparison, SARIF generation, and local findings enforcement. The wrapper defaults were changed to the free path.
+
+### Quick Test
+
+Open a pull request that introduces a source file matching a `p/default` security rule and verify that `security / semgrep` reports a finding and fails. Remove the finding and verify that the same job passes. Run the workflow manually on the default branch to request a full repository scan.
+
+### Maintenance Rule
+
+Do not enable dependency review, CodeQL, or SARIF uploads for a private repository unless GitHub Code Security entitlement is confirmed. Keep the Semgrep image on an explicit verified release, keep metrics disabled, and preserve both the synthetic fail control and local SARIF enforcement.
+
 ## Enforcement Model
 - Org defaults live in `MDSoftware-DE/.github`.
 - Reusable PR policy workflow source:

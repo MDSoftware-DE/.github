@@ -9,7 +9,27 @@ on:
         default: true
         type: boolean
       run_codeql:
-        description: Run CodeQL analysis
+        description: Run CodeQL analysis only for public repositories or repositories licensed for GitHub Code Security
+        required: false
+        default: true
+        type: boolean
+      run_semgrep:
+        description: Run free Semgrep Community Edition analysis with local SARIF enforcement
+        required: false
+        default: false
+        type: boolean
+      semgrep_config:
+        description: Semgrep Community Edition registry configuration
+        required: false
+        default: "p/default"
+        type: string
+      fail_on_semgrep_findings:
+        description: Fail the Semgrep job when the locally generated SARIF contains new findings
+        required: false
+        default: true
+        type: boolean
+      upload_gitleaks_sarif:
+        description: Upload gitleaks SARIF only when GitHub Code Security is available
         required: false
         default: true
         type: boolean
@@ -159,6 +179,94 @@ jobs:
         with:
           category: "/language:${{ matrix.language }}"
 
+  semgrep:
+    name: semgrep
+    if: ${{ inputs.run_semgrep }}
+    runs-on: ${{ fromJSON(inputs.runner_labels) }}
+    container:
+      image: semgrep/semgrep:1.170.0
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify Semgrep SARIF fail control
+        shell: bash
+        run: |
+          set -euo pipefail
+          control_dir="$(mktemp -d)"
+          trap 'rm -rf "${control_dir}"' EXIT
+
+          cat > "${control_dir}/rule.yml" <<'YAML'
+          rules:
+            - id: md-control-eval
+              languages:
+                - python
+              message: Synthetic control finding
+              severity: ERROR
+              pattern: eval(...)
+          YAML
+          printf '%s\n' 'user_input = "control"' 'eval(user_input)' > "${control_dir}/fixture.py"
+          semgrep scan \
+            --config "${control_dir}/rule.yml" \
+            --sarif \
+            --output "${control_dir}/control.sarif" \
+            --metrics off \
+            "${control_dir}/fixture.py"
+          python3 - "${control_dir}/control.sarif" <<'PY'
+          import json
+          import sys
+
+          with open(sys.argv[1], encoding="utf-8") as handle:
+              report = json.load(handle)
+          findings = sum(len(run.get("results", [])) for run in report.get("runs", []))
+          if findings != 1:
+              raise SystemExit(f"expected exactly one synthetic Semgrep finding, found {findings}")
+          print("Synthetic Semgrep SARIF control: 1 finding")
+          PY
+
+      - name: Run Semgrep CE
+        shell: bash
+        env:
+          SEMGREP_CONFIG: ${{ inputs.semgrep_config }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          args=(
+            scan
+            --config "${SEMGREP_CONFIG}"
+            --sarif
+            --output semgrep.sarif
+            --metrics off
+          )
+          if [[ "${{ github.event_name }}" == "pull_request" && -n "${PR_BASE_SHA}" ]]; then
+            args+=(--baseline-commit "${PR_BASE_SHA}")
+          fi
+          args+=(.)
+          semgrep "${args[@]}"
+
+      - name: Enforce Semgrep SARIF findings
+        if: ${{ always() && hashFiles('semgrep.sarif') != '' }}
+        shell: bash
+        env:
+          FAIL_ON_SEMGREP_FINDINGS: ${{ inputs.fail_on_semgrep_findings }}
+        run: |
+          set -euo pipefail
+          python3 - semgrep.sarif "${FAIL_ON_SEMGREP_FINDINGS}" <<'PY'
+          import json
+          import sys
+
+          with open(sys.argv[1], encoding="utf-8") as handle:
+              report = json.load(handle)
+          findings = sum(len(run.get("results", [])) for run in report.get("runs", []))
+          print(f"Semgrep findings: {findings}")
+          if sys.argv[2].lower() == "true" and findings:
+              raise SystemExit("Failing due to Semgrep findings.")
+          PY
+
   secret-scan:
     name: secret-scan
     if: ${{ inputs.run_secret_scan }}
@@ -189,7 +297,7 @@ jobs:
           gitleaks dir . --redact --report-format sarif --report-path gitleaks.sarif
 
       - name: Upload SARIF
-        if: ${{ always() && hashFiles('gitleaks.sarif') != '' }}
+        if: ${{ inputs.upload_gitleaks_sarif && always() && hashFiles('gitleaks.sarif') != '' }}
         continue-on-error: true
         uses: github/codeql-action/upload-sarif@v3
         with:
