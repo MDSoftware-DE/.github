@@ -21,9 +21,13 @@ jobs:
   security:
     uses: MDSoftware-DE/.github/.github/workflows/security-checks-reusable.yml@main
     with:
-      run_dependency_review: true
-      run_codeql: true
+      run_dependency_review: false
+      run_codeql: false
+      run_semgrep: true
       run_secret_scan: true
       codeql_languages: "javascript-typescript,python"
+      semgrep_config: "p/default"
+      fail_on_semgrep_findings: true
       fail_on_secret_findings: true
+      upload_gitleaks_sarif: false
       dependency_fail_on_severity: high
