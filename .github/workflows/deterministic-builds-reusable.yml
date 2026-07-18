@@ -8,6 +8,14 @@ on:
         required: false
         default: "20"
         type: string
+      pnpm_version:
+        description: >-
+          pnpm version to provision for pnpm repositories. Leave empty (recommended)
+          to use the `packageManager` field in package.json; set it only for repos
+          that have no `packageManager` field. Ignored for npm/yarn repos.
+        required: false
+        default: ""
+        type: string
       enforce_lockfile:
         description: Fail when package.json exists without a supported lockfile
         required: false
@@ -93,6 +101,20 @@ jobs:
             package-lock.json
             npm-shrinkwrap.json
 
+      # pnpm must be on PATH BEFORE the next step: actions/setup-node with `cache: pnpm`
+      # runs `pnpm store path` to locate the cache, so a missing pnpm fails the whole
+      # job with "Unable to locate executable file: pnpm". pnpm/action-setup installs
+      # pnpm to a standalone location and adds it to PATH via GITHUB_PATH, which (unlike
+      # a corepack shim in the system Node's bin dir) survives the Node swap the next
+      # step performs. With an empty `version` the action reads `packageManager` from
+      # package.json (recommended); `pnpm_version` overrides it for repos without that field.
+      - name: Provision pnpm
+        if: ${{ steps.detect.outputs.has_node == 'true' && steps.detect.outputs.manager == 'pnpm' }}
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ inputs.pnpm_version }}
+          run_install: false
+
       - name: Setup Node.js (pnpm)
         if: ${{ steps.detect.outputs.has_node == 'true' && steps.detect.outputs.manager == 'pnpm' }}
         uses: actions/setup-node@v4
@@ -129,7 +151,7 @@ jobs:
               npm ci
               ;;
             pnpm)
-              corepack enable
+              # pnpm is already on PATH from the "Provision pnpm" step above.
               pnpm install --frozen-lockfile
               ;;
             yarn)
