@@ -100,9 +100,30 @@ jobs:
         run: |
           set -euo pipefail
           git fetch --no-tags --depth=1 origin "${{ github.base_ref }}"
-          git diff --name-only "origin/${{ github.base_ref }}"...HEAD | grep -E '^docs/.*\.md$' > "$RUNNER_TEMP/docs_changed_md.txt" || true
+          # `|| true` here used to cover two different things: grep exiting 1
+          # because no docs file changed (normal), and the write itself being
+          # refused (a bug). The next step could not tell them apart -- it
+          # tested only for the file's existence -- so a failed write left a
+          # stale file in place and the gate validated the wrong list while
+          # reporting success. Each outcome is now handled on its own: grep's
+          # exit code is inspected, and anything other than "matched" or
+          # "matched nothing" fails the step.
+          rm -f "$RUNNER_TEMP/docs_changed_md.txt"
+          set +e
+          git diff --name-only "origin/${{ github.base_ref }}"...HEAD \
+            | grep -E '^docs/.*\.md$' > "$RUNNER_TEMP/docs_changed_md.txt"
+          rc=$?
+          set -e
+          if [[ $rc -gt 1 ]]; then
+            echo "::error::Could not determine the changed docs files (exit $rc). Refusing to validate an unknown set."
+            exit 1
+          fi
+          if [[ ! -f "$RUNNER_TEMP/docs_changed_md.txt" ]]; then
+            echo "::error::The changed-files list was not written. Refusing to validate an unknown set."
+            exit 1
+          fi
           echo "Changed docs markdown files:"
-          cat "$RUNNER_TEMP/docs_changed_md.txt" || true
+          cat "$RUNNER_TEMP/docs_changed_md.txt"
 
       - name: Validate docs structure and Mermaid standards
         shell: bash
