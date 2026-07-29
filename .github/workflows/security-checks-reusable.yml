@@ -283,10 +283,18 @@ jobs:
         run: |
           set -euo pipefail
           VERSION="8.24.2"
-          curl -sSL "https://github.com/gitleaks/gitleaks/releases/download/v${VERSION}/gitleaks_${VERSION}_linux_x64.tar.gz" -o /tmp/gitleaks.tgz
-          tar -xzf /tmp/gitleaks.tgz -C /tmp
+          # $RUNNER_TEMP, not /tmp: on a self-hosted runner /tmp is shared by
+          # every repository's runner user and is sticky, so only the owner of
+          # an existing file may replace it. A gitleaks binary left in /tmp by
+          # one repository therefore breaks this download for every other one
+          # -- observed on the wolverine runner, where a copy owned by an
+          # unrelated runner user had sat there since March 2025 and failed
+          # this step with `curl: (23) Failure writing output to destination`.
+          # $RUNNER_TEMP is per job and cleaned between jobs.
+          curl -sSL "https://github.com/gitleaks/gitleaks/releases/download/v${VERSION}/gitleaks_${VERSION}_linux_x64.tar.gz" -o "$RUNNER_TEMP/gitleaks.tgz"
+          tar -xzf "$RUNNER_TEMP/gitleaks.tgz" -C "$RUNNER_TEMP"
           mkdir -p "$HOME/.local/bin"
-          install -m 0755 /tmp/gitleaks "$HOME/.local/bin/gitleaks"
+          install -m 0755 "$RUNNER_TEMP/gitleaks" "$HOME/.local/bin/gitleaks"
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
           "$HOME/.local/bin/gitleaks" version
 
