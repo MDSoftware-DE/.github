@@ -100,17 +100,17 @@ jobs:
         run: |
           set -euo pipefail
           git fetch --no-tags --depth=1 origin "${{ github.base_ref }}"
-          git diff --name-only "origin/${{ github.base_ref }}"...HEAD | grep -E '^docs/.*\.md$' > /tmp/docs_changed_md.txt || true
+          git diff --name-only "origin/${{ github.base_ref }}"...HEAD | grep -E '^docs/.*\.md$' > "$RUNNER_TEMP/docs_changed_md.txt" || true
           echo "Changed docs markdown files:"
-          cat /tmp/docs_changed_md.txt || true
+          cat "$RUNNER_TEMP/docs_changed_md.txt" || true
 
       - name: Validate docs structure and Mermaid standards
         shell: bash
         run: |
           set -euo pipefail
           extra_args=()
-          if [[ "${{ github.event_name }}" == "pull_request" && "${{ inputs.changed_files_only }}" == "true" && -f /tmp/docs_changed_md.txt ]]; then
-            extra_args+=(--files-from /tmp/docs_changed_md.txt)
+          if [[ "${{ github.event_name }}" == "pull_request" && "${{ inputs.changed_files_only }}" == "true" && -f "$RUNNER_TEMP/docs_changed_md.txt" ]]; then
+            extra_args+=(--files-from "$RUNNER_TEMP/docs_changed_md.txt")
           fi
 
           python _org_defaults/.github/scripts/validate_docs_governance.py \
