@@ -283,10 +283,10 @@ jobs:
         run: |
           set -euo pipefail
           VERSION="8.24.2"
-          curl -sSL "https://github.com/gitleaks/gitleaks/releases/download/v${VERSION}/gitleaks_${VERSION}_linux_x64.tar.gz" -o /tmp/gitleaks.tgz
-          tar -xzf /tmp/gitleaks.tgz -C /tmp
+          curl -sSL "https://github.com/gitleaks/gitleaks/releases/download/v${VERSION}/gitleaks_${VERSION}_linux_x64.tar.gz" -o "$RUNNER_TEMP/gitleaks.tgz"
+          tar -xzf "$RUNNER_TEMP/gitleaks.tgz" -C "$RUNNER_TEMP"
           mkdir -p "$HOME/.local/bin"
-          install -m 0755 /tmp/gitleaks "$HOME/.local/bin/gitleaks"
+          install -m 0755 "$RUNNER_TEMP/gitleaks" "$HOME/.local/bin/gitleaks"
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
           "$HOME/.local/bin/gitleaks" version
 
