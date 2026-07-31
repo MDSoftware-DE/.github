@@ -45,3 +45,5 @@ Required rules:
 - When a hand-written unified diff needs multiple logical edits, validate and apply one exactly counted hunk at a time so one malformed hunk cannot block or obscure the others.
 - Do not use Markdown hard-break trailing spaces in governed documents; use separate paragraphs or explicit structure so `git diff --check` remains clean.
 - Before relying on `cp --update=none` for a no-clobber backup, verify that the installed `cp` supports the argument; otherwise require an explicit absent-target check before plain `cp`.
+- When introducing an enforcement validator before its migration change, record the exact pre-migration failures as the expected red state and require the migration task to turn that same check green.
+- Verify the actual minimum Python interpreter before writing plan signatures; use `Optional[Sequence[str]]` instead of PEP 604 unions when Python 3.8 must parse the file.

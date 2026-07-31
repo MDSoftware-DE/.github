@@ -147,7 +147,7 @@ The module exposes:
 
 - Immutable `Finding` records with `repository`, `workflow`, `job`, `value`, and `reason` string fields.
 - Public callable `validate_repository(repo_root: Path, repository: str, allowlist_path: Path, today: date) -> list[Finding]`.
-- CLI entry point `main(argv: Sequence[str] | None = None) -> int`.
+- CLI entry point `main(argv: Optional[Sequence[str]] = None) -> int`.
 
 It scans only `.github/workflows/*.yml` and `.yaml`, tracks YAML indentation for job scopes, validates literal `runs-on` strings and arrays, validates explicit `with.runner_labels` JSON on central reusable calls, and treats an omitted override as valid only when the referenced MDSoftware-DE reusable is in the known Wolverine-default set. Dynamic expressions not matching the central `fromJSON(inputs.runner_labels)` contract fail closed. Exit 0 means clean, exit 1 means policy findings, and exit 2 means invalid policy data.
 
@@ -163,7 +163,7 @@ python -m unittest discover -s .github/scripts/tests -p "test_validate_runner_po
 python .github/scripts/validate_runner_policy.py --repo-root . --repository MDSoftware-DE/.github --allowlist .github/runner-policy-allowlist.json
 ```
 
-Expected: all named tests pass; the repository smoke reports no unapproved active hosted runner.
+Expected: all named tests pass; the repository smoke exits 1 with exactly the five pre-migration reusable defaults. Task 4 changes those defaults and proves the same smoke exits 0.
 
 - [ ] **Step 5: Commit the validator**
 
