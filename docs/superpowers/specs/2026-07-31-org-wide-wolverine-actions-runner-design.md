@@ -15,6 +15,7 @@ This design covers the first phase only: runner migration and enforcement. Self-
 
 - Wolverine is the central trusted build runner for MDSoftware-DE repositories.
 - HULK, Nightcrawler, Colossus, Vision, and WANDA are deployment or runtime targets unless a repository documents a narrow exception.
+- Colossus remains exclusively a runtime, deployment, and monitoring target; Renovate and update pull-request automation belong on Wolverine.
 - The five central reusable workflows accept a JSON `runner_labels` input but default to `["ubuntu-latest"]`:
   - `policy-standards-reusable.yml`
   - `docs-governance-reusable.yml`
@@ -157,6 +158,8 @@ Security findings may be reported through ordinary job logs and check results. S
 Dependabot is a GitHub service and cannot be redirected to execute as a Wolverine service. Pull-request checks triggered by Dependabot can run on Wolverine, but Dependabot itself remains externally controlled.
 
 Replacing Dependabot with self-hosted Renovate on Wolverine is a separate phase. This runner migration neither disables Dependabot nor claims to make it self-hosted.
+
+The boundary is documented in Colossus PR https://github.com/MDSoftware-DE/vps-colossus-config/pull/326 at commit `e23466d01937c1b9fd017e2223cbc19f7fb1faab` and Wolverine PR https://github.com/MDSoftware-DE/vps-wolverine-config/pull/144 at commit `7ee75dcb01740a5c2896af8db0124bef56beb1a2`. Existing tracking issue https://github.com/MDSoftware-DE/vps-wolverine-config/issues/143 is authoritative; this phase must not create a duplicate Renovate issue or implement Renovate or Watchtower.
 
 ### Artifacts
 
