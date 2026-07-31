@@ -192,6 +192,23 @@ class RunnerPolicyValidatorTests(unittest.TestCase):
                 failures.append(f"{workflow_name}: stale hosted/runtime example remains")
         self.assertEqual([], failures, "\n".join(failures))
 
+    def test_runner_policy_workflows_are_wired(self) -> None:
+        central_path = REPOSITORY_ROOT / ".github" / "workflows" / "runner-policy.yml"
+        self.assertTrue(central_path.is_file(), "central runner-policy workflow is missing")
+        central = central_path.read_text(encoding="utf-8")
+        self.assertIn("runs-on: [self-hosted, wolverine]", central)
+        self.assertIn("validate_runner_policy.py", central)
+
+        reusable_path = REPOSITORY_ROOT / ".github" / "workflows" / "policy-standards-reusable.yml"
+        reusable = reusable_path.read_text(encoding="utf-8")
+        self.assertIn("enforce_wolverine_runner_policy:", reusable)
+        self.assertIn("path: _org_defaults", reusable)
+        self.assertIn("_org_defaults/.github/scripts/validate_runner_policy.py", reusable)
+
+        template_path = REPOSITORY_ROOT / ".github" / "workflow-templates" / "policy-standards.yml"
+        template = template_path.read_text(encoding="utf-8")
+        self.assertIn("enforce_wolverine_runner_policy: true", template)
+
 
 if __name__ == "__main__":
     unittest.main()

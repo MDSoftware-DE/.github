@@ -1,0 +1,30 @@
+name: runner-policy
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: runner-policy
+    runs-on: [self-hosted, wolverine]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate Wolverine runner policy
+        shell: bash
+        env:
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          python .github/scripts/validate_runner_policy.py \
+            --repo-root . \
+            --repository "${REPOSITORY}" \
+            --allowlist .github/runner-policy-allowlist.json

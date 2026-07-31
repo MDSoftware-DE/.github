@@ -20,3 +20,4 @@ jobs:
       require_issue_reference: true
       require_english_checkbox: true
       enforce_template_sections: true
+      enforce_wolverine_runner_policy: true

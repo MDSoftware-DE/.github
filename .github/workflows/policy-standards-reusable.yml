@@ -18,6 +18,11 @@ on:
         required: false
         default: true
         type: boolean
+      enforce_wolverine_runner_policy:
+        description: Validate active workflows against the central Wolverine runner policy
+        required: false
+        default: true
+        type: boolean
       runner_labels:
         description: JSON array for Wolverine runner selection, for example '["self-hosted","wolverine"]' or '["self-hosted","wolverine","repository-label"]'
         required: false
@@ -34,6 +39,33 @@ jobs:
     runs-on: ${{ fromJSON(inputs.runner_labels) }}
     if: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request_target' }}
     steps:
+      - name: Checkout target repository for runner policy
+        if: ${{ inputs.enforce_wolverine_runner_policy }}
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Checkout organization runner policy
+        if: ${{ inputs.enforce_wolverine_runner_policy }}
+        uses: actions/checkout@v4
+        with:
+          repository: MDSoftware-DE/.github
+          ref: main
+          path: _org_defaults
+
+      - name: Validate Wolverine runner policy
+        if: ${{ inputs.enforce_wolverine_runner_policy }}
+        shell: bash
+        env:
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          python _org_defaults/.github/scripts/validate_runner_policy.py \
+            --repo-root . \
+            --repository "${REPOSITORY}" \
+            --allowlist _org_defaults/.github/runner-policy-allowlist.json
+
       - name: Validate PR metadata policy
         uses: actions/github-script@v9.0.0
         env:
