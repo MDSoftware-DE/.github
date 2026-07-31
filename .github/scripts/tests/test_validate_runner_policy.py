@@ -192,6 +192,18 @@ class RunnerPolicyValidatorTests(unittest.TestCase):
                 failures.append(f"{workflow_name}: stale hosted/runtime example remains")
         self.assertEqual([], failures, "\n".join(failures))
 
+    def test_semgrep_reusable_runs_without_docker(self) -> None:
+        path = REPOSITORY_ROOT / ".github" / "workflows" / "security-checks-reusable.yml"
+        text = path.read_text(encoding="utf-8")
+        semgrep_job = (
+            text.split("\n  semgrep:", 1)[1]
+            .split("\n  secret-scan:", 1)[0]
+        )
+
+        self.assertNotIn("\n    container:", semgrep_job)
+        self.assertIn("semgrep==1.170.0", semgrep_job)
+        self.assertIn("python3 -m venv", semgrep_job)
+
     def test_runner_policy_workflows_are_wired(self) -> None:
         central_path = REPOSITORY_ROOT / ".github" / "workflows" / "runner-policy.yml"
         self.assertTrue(central_path.is_file(), "central runner-policy workflow is missing")
