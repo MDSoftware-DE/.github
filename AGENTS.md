@@ -33,3 +33,8 @@ Required rules:
 - Canonical template for new repos: `docs/codex/AGENTS_TEMPLATE.md`
 - Canonical standards doc: `docs/codex/CODEX_ORG_STANDARDS.md`
 - Canonical skill: `codex/skills/org-agents-governance/SKILL.md`
+
+## Lessons
+- When GitHub-hosted billing is disallowed, keep required checks enabled and route feasible workflows to Wolverine through self-hosted runner labels instead of disabling security gates or adding a hosted fallback.
+- When a hand-written unified diff needs multiple logical edits, validate and apply one exactly counted hunk at a time so one malformed hunk cannot block or obscure the others.
+- Do not use Markdown hard-break trailing spaces in governed documents; use separate paragraphs or explicit structure so `git diff --check` remains clean.
