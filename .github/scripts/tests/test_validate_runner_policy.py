@@ -210,6 +210,7 @@ class RunnerPolicyValidatorTests(unittest.TestCase):
         central = central_path.read_text(encoding="utf-8")
         self.assertIn("runs-on: [self-hosted, wolverine]", central)
         self.assertIn("validate_runner_policy.py", central)
+        self.assertIn("python3 .github/scripts/validate_runner_policy.py", central)
 
         reusable_path = REPOSITORY_ROOT / ".github" / "workflows" / "policy-standards-reusable.yml"
         reusable = reusable_path.read_text(encoding="utf-8")

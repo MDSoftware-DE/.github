@@ -24,7 +24,7 @@ jobs:
           REPOSITORY: ${{ github.repository }}
         run: |
           set -euo pipefail
-          python .github/scripts/validate_runner_policy.py \
+          python3 .github/scripts/validate_runner_policy.py \
             --repo-root . \
             --repository "${REPOSITORY}" \
             --allowlist .github/runner-policy-allowlist.json
