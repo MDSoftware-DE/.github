@@ -54,7 +54,7 @@ Architecture references:
 | `MDSoftware-DE/3cx-api` | `migrated` | 1 | — | — | `ci.yml` | no | — |
 | `MDSoftware-DE/ai-infra-architecture` | `no-actions-workflow` | 0 | — | — | — | no | — |
 | `MDSoftware-DE/ai-receptionist-platform` | `migrated` | 2 | — | — | `self-hosted-ci.yml` | no | — |
-| `MDSoftware-DE/autodoc-enterprise` | `needs-direct-workflow-change` | 6 | `ci.yml`, `renovate.yml` | `deterministic-builds.yml`, `policy-standards.yml`, `quality-gate.yml`, `security-checks.yml` | — | no | [central #11](https://github.com/MDSoftware-DE/.github/issues/11) |
+| `MDSoftware-DE/autodoc-enterprise` | `needs-direct-workflow-change` | 6 | `ci.yml`, `renovate.yml` | `deterministic-builds.yml`, `policy-standards.yml`, `quality-gate.yml`, `security-checks.yml` | — | no | [repo #35](https://github.com/MDSoftware-DE/autodoc-enterprise/issues/35); [Wolverine #143](https://github.com/MDSoftware-DE/vps-wolverine-config/issues/143) |
 | `MDSoftware-DE/avv-checker` | `inherits-central-default` | 4 | — | `deterministic-builds.yml`, `policy-standards.yml`, `quality-gate.yml`, `security-checks.yml` | — | no | — |
 | `MDSoftware-DE/car24-n8n-workflows` | `no-actions-workflow` | 0 | — | — | — | no | — |
 | `MDSoftware-DE/car24-recruiter` | `inherits-central-default` | 2 | — | `deterministic-builds.yml` | — | yes | [Wolverine #143](https://github.com/MDSoftware-DE/vps-wolverine-config/issues/143) |
@@ -69,32 +69,32 @@ Architecture references:
 | `MDSoftware-DE/drs-outbound-terminierung` | `no-actions-workflow` | 0 | — | — | — | no | — |
 | `MDSoftware-DE/drs-receptionist` | `migrated` | 2 | — | — | — | no | — |
 | `MDSoftware-DE/drs-sky-api` | `inherits-central-default` | 2 | — | `ci-terminierung-backend.yml`, `ci.yml` | — | no | — |
-| `MDSoftware-DE/empireon-datev-api` | `needs-runner-contract-review` | 18 | — | — | `frontend-e2e.yml`, `frontend-visual.yml`, `mermaid-render.yml`, `release-build.yml`, `secret-scan.yml`, `semgrep.yml` | no | [central #11](https://github.com/MDSoftware-DE/.github/issues/11) |
+| `MDSoftware-DE/empireon-datev-api` | `needs-runner-contract-review` | 18 | — | — | `frontend-e2e.yml`, `frontend-visual.yml`, `mermaid-render.yml`, `release-build.yml`, `secret-scan.yml`, `semgrep.yml` | no | [repo #7](https://github.com/MDSoftware-DE/empireon-datev-api/issues/7) |
 | `MDSoftware-DE/empireon-landingpage-academy` | `migrated` | 2 | — | — | — | no | — |
-| `MDSoftware-DE/empireon-landingpage-steuer-ki-ext1` | `needs-direct-workflow-change` | 1 | `ci.yml` | — | — | yes | [central #11](https://github.com/MDSoftware-DE/.github/issues/11); [Wolverine #143](https://github.com/MDSoftware-DE/vps-wolverine-config/issues/143) |
+| `MDSoftware-DE/empireon-landingpage-steuer-ki-ext1` | `needs-direct-workflow-change` | 1 | `ci.yml` | — | — | yes | [repo #17](https://github.com/MDSoftware-DE/empireon-landingpage-steuer-ki-ext1/issues/17); [Wolverine #143](https://github.com/MDSoftware-DE/vps-wolverine-config/issues/143) |
 | `MDSoftware-DE/empireon-landingpage-steuerberater` | `migrated` | 1 | — | — | — | no | — |
 | `MDSoftware-DE/empireon-landingpage-steuerberater-ext-1` | `no-actions-workflow` | 0 | — | — | — | no | — |
-| `MDSoftware-DE/empireon-landingpage-voice-ai-ext1` | `needs-direct-workflow-change` | 1 | `deploy.yml` | — | — | no | [central #11](https://github.com/MDSoftware-DE/.github/issues/11) |
+| `MDSoftware-DE/empireon-landingpage-voice-ai-ext1` | `needs-direct-workflow-change` | 1 | `deploy.yml` | — | — | no | [repo #8](https://github.com/MDSoftware-DE/empireon-landingpage-voice-ai-ext1/issues/8) |
 | `MDSoftware-DE/etl-mittelhessen` | `inherits-central-default` | 1 | — | `backend-ci.yml` | — | no | — |
-| `MDSoftware-DE/etl-standorte-grabber` | `needs-direct-workflow-change` | 6 | `pr-template-guard.yml` | `deterministic-builds.yml`, `docs-governance.yml`, `policy-standards.yml`, `quality-gate.yml`, `security-checks.yml` | — | no | [central #11](https://github.com/MDSoftware-DE/.github/issues/11) |
+| `MDSoftware-DE/etl-standorte-grabber` | `needs-direct-workflow-change` | 6 | `pr-template-guard.yml` | `deterministic-builds.yml`, `docs-governance.yml`, `policy-standards.yml`, `quality-gate.yml`, `security-checks.yml` | — | no | [repo #14](https://github.com/MDSoftware-DE/etl-standorte-grabber/issues/14) |
 | `MDSoftware-DE/etl-voice-ai-receptionist` | `inherits-central-default` | 13 | — | `deterministic-builds.yml`, `docs-governance.yml`, `policy-standards.yml`, `quality-gate.yml`, `security-checks.yml` | — | no | — |
 | `MDSoftware-DE/infra-nightcrawler` | `inherits-central-default` | 3 | — | `deterministic-builds.yml`, `quality-gate.yml`, `security-checks.yml` | — | no | — |
 | `MDSoftware-DE/llm-benchmarks` | `no-actions-workflow` | 0 | — | — | — | no | — |
 | `MDSoftware-DE/mahn-wizard` | `inherits-central-default` | 4 | — | `deterministic-builds.yml`, `policy-standards.yml`, `quality-gate.yml`, `security-checks.yml` | — | no | — |
 | `MDSoftware-DE/md-dograh-voice-stack` | `no-actions-workflow` | 0 | — | — | — | no | — |
 | `MDSoftware-DE/md-knowledge-platform` | `migrated` | 2 | — | — | — | no | — |
-| `MDSoftware-DE/md-mail-service` | `needs-direct-workflow-change` | 1 | `ci.yml` | — | — | no | [central #11](https://github.com/MDSoftware-DE/.github/issues/11) |
+| `MDSoftware-DE/md-mail-service` | `needs-direct-workflow-change` | 1 | `ci.yml` | — | — | no | [repo #14](https://github.com/MDSoftware-DE/md-mail-service/issues/14) |
 | `MDSoftware-DE/md-n8n-shared-workflows` | `no-actions-workflow` | 0 | — | — | — | no | — |
-| `MDSoftware-DE/md-outlook-secretary` | `needs-direct-workflow-change` | 9 | `n8n-deploy.yml`, `n8n-post-deploy-rebind.yml`, `repo-hygiene.yml` | `deterministic-builds.yml`, `docs-governance.yml`, `policy-standards.yml`, `quality-gate.yml`, `security-checks.yml` | — | no | [central #11](https://github.com/MDSoftware-DE/.github/issues/11) |
+| `MDSoftware-DE/md-outlook-secretary` | `needs-direct-workflow-change` | 9 | `n8n-deploy.yml`, `n8n-post-deploy-rebind.yml`, `repo-hygiene.yml` | `deterministic-builds.yml`, `docs-governance.yml`, `policy-standards.yml`, `quality-gate.yml`, `security-checks.yml` | — | no | [repo #47](https://github.com/MDSoftware-DE/md-outlook-secretary/issues/47) |
 | `MDSoftware-DE/MD-Vault` | `inherits-central-default` | 4 | — | `deterministic-builds.yml`, `policy-standards.yml`, `quality-gate.yml`, `security-checks.yml` | — | no | — |
 | `MDSoftware-DE/md-website-legacy` | `no-actions-workflow` | 0 | — | — | — | no | — |
 | `MDSoftware-DE/n8n-retell-invoicing-data` | `no-actions-workflow` | 0 | — | — | — | no | — |
-| `MDSoftware-DE/nas-hulk-config` | `needs-direct-workflow-change` | 5 | `org-agents-baseline-sync.yml`, `org-issue-template-sync.yml`, `org-pr-docs-remediation-automerge.yml`, `org-pr-docs-standards-sync.yml`, `troubleshooting-guardrails.yml` | — | — | no | [central #11](https://github.com/MDSoftware-DE/.github/issues/11) |
+| `MDSoftware-DE/nas-hulk-config` | `needs-direct-workflow-change` | 5 | `org-agents-baseline-sync.yml`, `org-issue-template-sync.yml`, `org-pr-docs-remediation-automerge.yml`, `org-pr-docs-standards-sync.yml`, `troubleshooting-guardrails.yml` | — | — | no | [repo #45](https://github.com/MDSoftware-DE/nas-hulk-config/issues/45) |
 | `MDSoftware-DE/nexus-api` | `migrated` | 11 | — | — | — | no | — |
-| `MDSoftware-DE/opencve` | `needs-direct-workflow-change` | 3 | `release-image.yml`, `security-review.yml`, `tests.yml` | — | — | no | [central #11](https://github.com/MDSoftware-DE/.github/issues/11) |
+| `MDSoftware-DE/opencve` | `needs-direct-workflow-change` | 3 | `release-image.yml`, `security-review.yml`, `tests.yml` | — | — | no | [central #11](https://github.com/MDSoftware-DE/.github/issues/11) (repository issues disabled) |
 | `MDSoftware-DE/ops-triage` | `migrated` | 2 | — | — | — | no | — |
 | `MDSoftware-DE/oracle` | `inherits-central-default` | 4 | — | `deterministic-builds.yml`, `policy-standards.yml`, `quality-gate.yml`, `security-checks.yml` | — | no | — |
-| `MDSoftware-DE/paperless-gpt` | `needs-direct-workflow-change` | 2 | `docker-build-and-push.yml`, `smoke.yml` | — | `docker-build-and-push.yml` | no | [central #11](https://github.com/MDSoftware-DE/.github/issues/11) |
+| `MDSoftware-DE/paperless-gpt` | `needs-direct-workflow-change` | 2 | `docker-build-and-push.yml`, `smoke.yml` | — | `docker-build-and-push.yml` | no | [repo #4](https://github.com/MDSoftware-DE/paperless-gpt/issues/4) |
 | `MDSoftware-DE/paperless-hulk-pipeline` | `inherits-central-default` | 5 | — | `deterministic-builds.yml`, `docs-governance.yml`, `policy-standards.yml`, `quality-gate.yml`, `security-checks.yml` | — | no | — |
 | `MDSoftware-DE/Powershell` | `inherits-central-default` | 4 | — | `deterministic-builds.yml`, `policy-standards.yml`, `quality-gate.yml`, `security-checks.yml` | — | no | — |
 | `MDSoftware-DE/protocol-slave` | `inherits-central-default` | 8 | — | `deterministic-builds.yml`, `docs-governance.yml`, `policy-standards.yml`, `quality-gate.yml`, `security-checks.yml` | `ci.yml` | no | — |
@@ -106,9 +106,9 @@ Architecture references:
 | `MDSoftware-DE/vps-ghost-config` | `no-actions-workflow` | 0 | — | — | — | no | — |
 | `MDSoftware-DE/vps-nightcrawler-config` | `no-actions-workflow` | 0 | — | — | — | no | — |
 | `MDSoftware-DE/vps-wolverine-config` | `migrated` | 2 | — | — | — | no | — |
-| `MDSoftware-DE/whisperx-vision-pipeline` | `needs-direct-workflow-change` | 6 | `runtime-path-checks.yml` | `deterministic-builds.yml`, `docs-governance.yml`, `policy-standards.yml`, `quality-gate.yml`, `security-checks.yml` | — | no | [central #11](https://github.com/MDSoftware-DE/.github/issues/11) |
-| `MDSoftware-DE/zugferd` | `needs-direct-workflow-change` | 7 | `github-to-gitlab-sync.yml`, `validate-fixtures-xsd.yml` | `deterministic-builds.yml`, `docs-governance.yml`, `policy-standards.yml`, `quality-gate.yml`, `security-checks.yml` | — | no | [central #11](https://github.com/MDSoftware-DE/.github/issues/11) |
-| `MDSoftware-DE/zukauf-agent-ui` | `needs-direct-workflow-change` | 6 | `i18n-check.yml`, `renovate.yml` | `deterministic-builds.yml`, `policy-standards.yml`, `quality-gate.yml`, `security-checks.yml` | — | no | [central #11](https://github.com/MDSoftware-DE/.github/issues/11) |
+| `MDSoftware-DE/whisperx-vision-pipeline` | `needs-direct-workflow-change` | 6 | `runtime-path-checks.yml` | `deterministic-builds.yml`, `docs-governance.yml`, `policy-standards.yml`, `quality-gate.yml`, `security-checks.yml` | — | no | [repo #39](https://github.com/MDSoftware-DE/whisperx-vision-pipeline/issues/39) |
+| `MDSoftware-DE/zugferd` | `needs-direct-workflow-change` | 7 | `github-to-gitlab-sync.yml`, `validate-fixtures-xsd.yml` | `deterministic-builds.yml`, `docs-governance.yml`, `policy-standards.yml`, `quality-gate.yml`, `security-checks.yml` | — | no | [repo #10](https://github.com/MDSoftware-DE/zugferd/issues/10) |
+| `MDSoftware-DE/zukauf-agent-ui` | `needs-direct-workflow-change` | 6 | `i18n-check.yml`, `renovate.yml` | `deterministic-builds.yml`, `policy-standards.yml`, `quality-gate.yml`, `security-checks.yml` | — | no | [repo #22](https://github.com/MDSoftware-DE/zukauf-agent-ui/issues/22); [Wolverine #143](https://github.com/MDSoftware-DE/vps-wolverine-config/issues/143) |
 
 ## Direct Hosted-Runner Migration Set
 

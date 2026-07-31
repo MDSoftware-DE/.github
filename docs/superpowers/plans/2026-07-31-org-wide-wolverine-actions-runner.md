@@ -348,11 +348,11 @@ Observed on 2026-07-31:
 **Files:**
 - Modify: `docs/reports/2026-07-31-wolverine-runner-inventory.md`
 
-- [ ] **Step 1: Classify every remaining active repository**
+- [x] **Step 1: Classify every remaining active repository**
 
 Use states `migrated`, `inherits-central-default`, `needs-direct-workflow-change`, `approved-os-exception`, or `no-actions-workflow`. Every non-final state includes an issue URL and exact workflow paths.
 
-- [ ] **Step 2: Search before creating each repository issue**
+- [x] **Step 2: Search before creating each repository issue**
 
 Run:
 ```sh
