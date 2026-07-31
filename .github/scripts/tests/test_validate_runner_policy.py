@@ -9,6 +9,14 @@ from datetime import date
 from pathlib import Path
 
 SCRIPTS_DIR = Path(__file__).resolve().parents[1]
+REPOSITORY_ROOT = SCRIPTS_DIR.parents[1]
+CENTRAL_REUSABLES = (
+    "deterministic-builds-reusable.yml",
+    "docs-governance-reusable.yml",
+    "policy-standards-reusable.yml",
+    "quality-gate-reusable.yml",
+    "security-checks-reusable.yml",
+)
 sys.path.insert(0, str(SCRIPTS_DIR))
 
 from validate_runner_policy import validate_repository
@@ -170,6 +178,19 @@ class RunnerPolicyValidatorTests(unittest.TestCase):
             {".github/workflows/mixed.yaml"},
             {finding.workflow for finding in findings},
         )
+
+    def test_central_reusable_defaults_are_wolverine(self) -> None:
+        expected_default = "default: '[\"self-hosted\",\"wolverine\"]'"
+        failures = []
+        for workflow_name in CENTRAL_REUSABLES:
+            path = REPOSITORY_ROOT / ".github" / "workflows" / workflow_name
+            text = path.read_text(encoding="utf-8")
+            runner_block = text.split("runner_labels:", 1)[1].split("\n\npermissions:", 1)[0]
+            if expected_default not in runner_block:
+                failures.append(f"{workflow_name}: Wolverine default missing")
+            if "ubuntu-latest" in runner_block or "nightcrawler" in runner_block:
+                failures.append(f"{workflow_name}: stale hosted/runtime example remains")
+        self.assertEqual([], failures, "\n".join(failures))
 
 
 if __name__ == "__main__":
