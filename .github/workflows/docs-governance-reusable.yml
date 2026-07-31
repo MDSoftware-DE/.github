@@ -64,9 +64,9 @@ on:
         default: false
         type: boolean
       runner_labels:
-        description: JSON string or array for the runner selection, for example '"ubuntu-latest"' or '["self-hosted","nightcrawler"]'
+        description: JSON array for Wolverine runner selection, for example '["self-hosted","wolverine"]' or '["self-hosted","wolverine","repository-label"]'
         required: false
-        default: '"ubuntu-latest"'
+        default: '["self-hosted","wolverine"]'
         type: string
 
 permissions:

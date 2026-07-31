@@ -22,6 +22,31 @@ Each active repository should contain:
 - `.github/workflows/docs-governance.yml` aligned with `docs/codex/workflows/docs-governance.yml`
 - `pull_request_template.md` and `CONTRIBUTING.md` aligned with org defaults
 
+## GitHub Actions Build Routing
+
+### Purpose
+
+Keep organization CI independent from GitHub-hosted runner billing while preserving required security, policy, quality, test, and build gates.
+
+### Current Status Snapshot
+
+- Wolverine is the central trusted self-hosted build runner.
+- Central reusable workflows use the labels `self-hosted` and `wolverine` by default.
+- HULK, Nightcrawler, Colossus, Vision, and WANDA remain deployment or runtime targets unless a repository documents a narrow exception.
+- GitHub-managed artifact storage and Dependabot are separate migration concerns.
+
+### Last Change
+
+On 2026-07-31, the organization made Wolverine the permanent default and prohibited automatic GitHub-hosted fallbacks.
+
+### Quick Test
+
+Run `python .github/scripts/validate_runner_policy.py --repo-root . --repository MDSoftware-DE/.github --allowlist .github/runner-policy-allowlist.json` and verify that it exits successfully.
+
+### Maintenance Rule
+
+Every feasible Linux job must resolve to labels containing both `self-hosted` and `wolverine`. Required gates remain enabled. Hosted execution requires an exact central allowlist entry with owner, approval reference, and review date.
+
 ## Documentation Structure Baseline
 Documentation is standardized around these canonical paths:
 - `docs/README.md` (or `docs/index.md`) as entry point

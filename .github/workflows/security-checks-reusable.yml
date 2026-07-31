@@ -54,9 +54,9 @@ on:
         default: high
         type: string
       runner_labels:
-        description: JSON string or array for the runner selection, for example '"ubuntu-latest"' or '["self-hosted","nightcrawler"]'
+        description: JSON array for Wolverine runner selection, for example '["self-hosted","wolverine"]' or '["self-hosted","wolverine","repository-label"]'
         required: false
-        default: '"ubuntu-latest"'
+        default: '["self-hosted","wolverine"]'
         type: string
 
 permissions:
@@ -183,8 +183,6 @@ jobs:
     name: semgrep
     if: ${{ inputs.run_semgrep }}
     runs-on: ${{ fromJSON(inputs.runner_labels) }}
-    container:
-      image: semgrep/semgrep:1.170.0
     permissions:
       contents: read
     steps:
@@ -192,6 +190,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Install Semgrep CE
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m venv "${RUNNER_TEMP}/semgrep-venv"
+          "${RUNNER_TEMP}/semgrep-venv/bin/python" -m pip install --disable-pip-version-check --no-input "semgrep==1.170.0"
+          echo "${RUNNER_TEMP}/semgrep-venv/bin" >> "${GITHUB_PATH}"
 
       - name: Verify Semgrep SARIF fail control
         shell: bash
