@@ -365,11 +365,11 @@ Update a matching issue or create one detailed English issue; never create dupli
 
 Renovate is already tracked by `https://github.com/MDSoftware-DE/vps-wolverine-config/issues/143` and documented by Colossus PR `https://github.com/MDSoftware-DE/vps-colossus-config/pull/326` plus Wolverine PR `https://github.com/MDSoftware-DE/vps-wolverine-config/pull/144`. Do not create another Renovate issue, implement Renovate or Watchtower, merge either documentation PR, or modify their unrelated worktrees in this plan.
 
-- [ ] **Step 3: Update central issue 11 and the central PR**
+- [x] **Step 3: Update central issue 11 and the central PR**
 
 Comment with the inventory commit, the canary evidence, repositories migrated through inherited defaults, direct migrations still required, artifact-storage users for the later Harbor phase, and Dependabot users for the later Renovate phase.
 
-- [ ] **Step 4: Produce the implementation checkpoint**
+- [x] **Step 4: Produce the implementation checkpoint**
 
 Report commits, changed global files, backup paths, test counts, central PR URL, canary run URLs, unresolved repository issues, runner capacity risks, and confirm that no production/runtime service was changed.
 
