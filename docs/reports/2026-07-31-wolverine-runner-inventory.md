@@ -14,6 +14,7 @@ Record the organization-wide default-branch evidence needed to move feasible Git
 - Repositories using GitHub-managed Actions artifacts: 8.
 - Repositories with a default-branch Dependabot configuration: 2.
 - Classification: inherits-central-default=17, migrated=12, migrated-in-this-branch=1, needs-direct-workflow-change=12, needs-runner-contract-review=1, no-actions-workflow=16.
+- Central execution dependency: `MDSoftware-DE/.github` currently sees zero self-hosted runners; [Wolverine #145](https://github.com/MDSoftware-DE/vps-wolverine-config/issues/145) and draft [PR #146](https://github.com/MDSoftware-DE/vps-wolverine-config/pull/146) provision the required repository-scoped runner.
 
 Colossus remains exclusively a runtime, deployment, and monitoring target. Renovate and update pull-request automation belong on Wolverine and are already tracked by [vps-wolverine-config#143](https://github.com/MDSoftware-DE/vps-wolverine-config/issues/143). No duplicate Renovate issue is required.
 
@@ -26,6 +27,14 @@ Architecture references:
 - [Colossus PR #326](https://github.com/MDSoftware-DE/vps-colossus-config/pull/326), commit `e23466d01937c1b9fd017e2223cbc19f7fb1faab`.
 - [Wolverine PR #144](https://github.com/MDSoftware-DE/vps-wolverine-config/pull/144), commit `7ee75dcb01740a5c2896af8db0124bef56beb1a2`.
 - [Wolverine Renovate issue #143](https://github.com/MDSoftware-DE/vps-wolverine-config/issues/143).
+- [Central runner issue #145](https://github.com/MDSoftware-DE/vps-wolverine-config/issues/145).
+- [Central runner draft PR #146](https://github.com/MDSoftware-DE/vps-wolverine-config/pull/146), commit `d46ba60`.
+
+## Live Phase 1 Evidence
+
+- [DGX security run 30622631066](https://github.com/MDSoftware-DE/dgx-spark-vision-config/actions/runs/30622631066) ran on `wolverine-vision-config` and passed both Gitleaks and Docker-free Semgrep.
+- Semgrep `1.170.0` completed its synthetic one-finding control and reported zero repository findings.
+- The central [runner-policy job](https://github.com/MDSoftware-DE/.github/actions/runs/30622544325/job/91130219213) remains queued because the `.github` repository runner is not yet integrated or live; no hosted fallback is enabled.
 
 ## Method
 
@@ -41,7 +50,7 @@ Architecture references:
 
 | Repository | State | Workflow files | Hosted-label files | Central reusable files | Artifact files | Dependabot | Tracking |
 |---|---|---:|---|---|---|---|---|
-| `MDSoftware-DE/.github` | `migrated-in-this-branch` | 5 | `deterministic-builds-reusable.yml`, `docs-governance-reusable.yml`, `policy-standards-reusable.yml`, `quality-gate-reusable.yml`, `security-checks-reusable.yml` | — | — | no | [central #11](https://github.com/MDSoftware-DE/.github/issues/11) |
+| `MDSoftware-DE/.github` | `migrated-in-this-branch` | 5 | `deterministic-builds-reusable.yml`, `docs-governance-reusable.yml`, `policy-standards-reusable.yml`, `quality-gate-reusable.yml`, `security-checks-reusable.yml` | — | — | no | [central #11](https://github.com/MDSoftware-DE/.github/issues/11); [Wolverine #145](https://github.com/MDSoftware-DE/vps-wolverine-config/issues/145); [PR #146](https://github.com/MDSoftware-DE/vps-wolverine-config/pull/146) |
 | `MDSoftware-DE/3cx-api` | `migrated` | 1 | — | — | `ci.yml` | no | — |
 | `MDSoftware-DE/ai-infra-architecture` | `no-actions-workflow` | 0 | — | — | — | no | — |
 | `MDSoftware-DE/ai-receptionist-platform` | `migrated` | 2 | — | — | `self-hosted-ci.yml` | no | — |

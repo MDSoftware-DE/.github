@@ -307,7 +307,7 @@ The PR body uses the repository template, links `https://github.com/MDSoftware-D
 **Files:**
 - Modify: `/volume1/homes/Miki/.config/superpowers/worktrees/dgx-spark-vision-config/qwen36-dynamo-phase1/.github/workflows/security-checks.yml`
 
-- [ ] **Step 1: Verify the existing feature worktree and branch before editing**
+- [x] **Step 1: Verify the existing feature worktree and branch before editing**
 
 ```sh
 git -C /volume1/homes/Miki/.config/superpowers/worktrees/dgx-spark-vision-config/qwen36-dynamo-phase1 status --short --branch
@@ -316,7 +316,7 @@ git -C /volume1/homes/Miki/.config/superpowers/worktrees/dgx-spark-vision-config
 
 Expected: branch `feat/qwen36-dynamo-phase1`, clean worktree, and existing phase-1 commit history.
 
-- [ ] **Step 2: Add the explicit canary override**
+- [x] **Step 2: Add the explicit canary override**
 
 Under the existing reusable security job `with:` block add:
 ```yaml
@@ -325,15 +325,23 @@ runner_labels: '["self-hosted","wolverine","vision-config"]'
 
 Parse the resulting YAML and assert there is exactly one `with:` mapping for the job.
 
-- [ ] **Step 3: Run the repository contract tests and commit**
+- [x] **Step 3: Run the repository contract tests and commit**
 
 Run the existing workflow contract test suite and `git diff --check`. Commit with `ci: run security checks on Wolverine`, then push the existing branch.
 
-- [ ] **Step 4: Re-run and inspect PR 138 checks**
+- [x] **Step 4: Re-run and inspect PR 138 checks**
 
 Use `gh pr checks 138 --repo MDSoftware-DE/dgx-spark-vision-config --watch` and inspect both security job logs.
 
 Expected: Semgrep and Gitleaks start on Wolverine, execute non-empty steps, and no job contains the GitHub billing annotation. Existing policy, quality, and deterministic-build checks remain green.
+
+Observed on 2026-07-31:
+
+- [DGX security run 30622631066](https://github.com/MDSoftware-DE/dgx-spark-vision-config/actions/runs/30622631066) completed successfully on `wolverine-vision-config`.
+- Gitleaks completed in 9 seconds; Semgrep completed in 37 seconds with version `1.170.0`, one synthetic control finding, and zero repository findings.
+- Policy, quality, and deterministic-build checks remained green without a GitHub-hosted fallback.
+- The canary caller temporarily targets the central PR branch and must return to `@main` after central PR #12 is integrated.
+- The central `.github` repository currently sees zero runners; provisioning is tracked by [Wolverine #145](https://github.com/MDSoftware-DE/vps-wolverine-config/issues/145) and green draft [PR #146](https://github.com/MDSoftware-DE/vps-wolverine-config/pull/146).
 
 ### Task 8: Record remaining repository migrations without silent work
 
