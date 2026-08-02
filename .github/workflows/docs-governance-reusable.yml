@@ -113,7 +113,7 @@ jobs:
             extra_args+=(--files-from "$RUNNER_TEMP/docs_changed_md.txt")
           fi
 
-          python _org_defaults/.github/scripts/validate_docs_governance.py \
+          python3 _org_defaults/.github/scripts/validate_docs_governance.py \
             --docs-root "${{ inputs.docs_root }}" \
             "${extra_args[@]}" \
             --require-docs-index "${{ inputs.require_docs_index }}" \
