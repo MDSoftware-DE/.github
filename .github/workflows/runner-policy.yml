@@ -28,3 +28,9 @@ jobs:
             --repo-root . \
             --repository "${REPOSITORY}" \
             --allowlist .github/runner-policy-allowlist.json
+
+      - name: Test governance validators and Semgrep enforcement
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s .github/scripts/tests

@@ -164,6 +164,7 @@ Provide a meaningful shared security gate for public, licensed private, and GitH
 
 - The default wrapper uses Semgrep Community Edition with `p/default` and local SARIF enforcement.
 - Pull requests compare Semgrep findings with the pull request base commit, so new findings fail without silently accepting them.
+- SARIF enforcement honors rule-scoped `nosemgrep` in-source suppressions with absent or `accepted` status; unmarked, rejected, under-review, unknown-status and external suppressions remain blocking. Source suppressions require review and justification in the owning repository, not a global rule exclusion.
 - Gitleaks runs and enforces findings locally; SARIF upload is disabled by default.
 - GitHub dependency review and CodeQL remain available as explicit opt-ins for public repositories or private repositories licensed for GitHub Code Security.
 - The default wrapper runs on pull requests and manual dispatch. It does not add a default-branch push trigger, which conserves included GitHub Actions minutes. Dependabot alerts remain the default-branch dependency monitor; manual dispatch performs a full Semgrep scan.
@@ -171,15 +172,19 @@ Provide a meaningful shared security gate for public, licensed private, and GitH
 
 ### Last Change
 
-On 2026-07-16, the shared workflow added a Semgrep Community Edition v1.170.0 path with a synthetic fail control, pull-request baseline comparison, SARIF generation, and local findings enforcement. The wrapper defaults were changed to the free path.
+On 2026-09-12, SARIF enforcement was corrected to distinguish Semgrep's retained in-source suppressions from open findings. The scanner, baseline comparison, synthetic fail control, runner labels and enforcement defaults remain unchanged. The prior counter incorrectly blocked HAAS despite zero unsuppressed findings.
 
 ### Quick Test
 
 Open a pull request that introduces a source file matching a `p/default` security rule and verify that `security / semgrep` reports a finding and fails. Remove the finding and verify that the same job passes. Run the workflow manually on the default branch to request a full repository scan.
 
+Run `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s .github/scripts/tests` to exercise the actual inline workflow gate with synthetic SARIF. The tests cover open, in-source suppressed, pending/rejected, external, mixed-run and report-only cases and run in the central Wolverine CI job.
+
 ### Maintenance Rule
 
 Do not enable dependency review, CodeQL, or SARIF uploads for a private repository unless GitHub Code Security entitlement is confirmed. Keep the Semgrep image on an explicit verified release, keep metrics disabled, and preserve both the synthetic fail control and local SARIF enforcement.
+
+When changing suppression handling, verify the exact SARIF output and gate exit status, not just the scanner's console or JSON summary. Keep open findings blocking. Interpret status explicitly as described by the [SARIF suppression contract](https://docs.oasis-open.org/sarif/sarif/v2.1.0/os/sarif-v2.1.0-os.html); this gate deliberately does not accept external suppressions.
 
 ## Enforcement Model
 - Org defaults live in `MDSoftware-DE/.github`.

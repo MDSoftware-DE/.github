@@ -267,7 +267,18 @@ jobs:
 
           with open(sys.argv[1], encoding="utf-8") as handle:
               report = json.load(handle)
-          findings = sum(len(run.get("results", [])) for run in report.get("runs", []))
+          # Semgrep retains nosemgrep results in SARIF. Only honor in-source
+          # suppressions without a pending/rejected status; keep other findings.
+          findings = sum(
+              1
+              for run in report.get("runs", [])
+              for result in run.get("results", [])
+              if not any(
+                  suppression.get("kind") == "inSource"
+                  and suppression.get("status", "accepted") == "accepted"
+                  for suppression in result.get("suppressions", [])
+              )
+          )
           print(f"Semgrep findings: {findings}")
           if sys.argv[2].lower() == "true" and findings:
               raise SystemExit("Failing due to Semgrep findings.")
